@@ -1,0 +1,51 @@
+repos:
+  - repo: local
+    hooks:
+      - id: debug-statements
+        name: 🪵 debug
+        language: system
+        types: [python]
+        entry: poetry run debug-statement-hook
+        stages: [commit]
+
+      - id: isort
+        name: 🔀 isort
+        entry: poetry run isort
+        language: system
+        types: [python]
+        stages: [commit]
+
+      - id: black
+        name: ⚫ black
+        entry: poetry run black
+        language: system
+        types: [python]
+        stages: [commit]
+
+      - id: mypy
+        name: 🆎 mypy
+        entry: poetry run mypy
+        language: system
+        types: [python]
+        stages: [commit]
+        exclude: ^tests/
+
+      - id: interrogate
+        name: 🔎 interrogate
+        language: system
+        types: [python]
+        entry: poetry run interrogate
+        args: [--fail-under=40, --omit-covered-files, app]
+        require_serial: true
+        exclude: |
+          (?x)(
+              ^tests/|
+              ^alembic/
+          )
+
+      - id: pylint
+        name: 🌟 pylint
+        entry: poetry run pylint --fail-under=9.81 --verbose
+        language: system
+        types: [python]
+        stages: [commit]

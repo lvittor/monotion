@@ -1,0 +1,110 @@
+version: '3.9'
+
+#https://github.com/compose-spec/compose-spec/blob/master/spec.md#using-extensions-as-fragments
+x-logging:
+    &default-logging
+    options:
+        max-size: "100m"
+        max-file: "5"
+    driver: json-file
+
+x-hasura-env-vars:
+    &hasura-env-vars
+    HASURA_GRAPHQL_ADMIN_SECRET: CHANGEME-4cPmnM34
+
+services:
+    backend:
+        image: ${COMPOSE_PROJECT_NAME}:latest
+        build:
+            context: ../
+            dockerfile: ./docker/Dockerfile
+        ports:
+            - "8002:80"
+        volumes:
+            - ..:/code
+        depends_on:
+            - waitfor-db
+        environment:
+            POSTGRES_USER: "${POSTGRES_USER}"
+            POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+            POSTGRES_DB: "${POSTGRES_DB}"
+            POSTGRES_HOST: "${POSTGRES_HOST}"
+            POSTGRES_PORT: "${POSTGRES_PORT}"
+            
+    postgres:
+        image: postgres:13.8
+        ports:
+            - ${POSTGRES_PORT}:5432
+        environment:
+            POSTGRES_USER: "${POSTGRES_USER}"
+            POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+            POSTGRES_DB: "${POSTGRES_DB}"
+        restart: always
+        volumes:
+            - web3-db-data:/var/lib/postgresql/data
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-U", "postgres" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    waitfor-db:
+        image: dadarek/wait-for-dependencies
+        depends_on:
+            - postgres
+        command: postgres:5432
+
+    init-db:
+        image: ${COMPOSE_PROJECT_NAME}:latest
+        build:
+            context: ../
+            dockerfile: ./docker/Dockerfile
+        environment:
+            POSTGRES_USER: "${POSTGRES_USER}"
+            POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+            POSTGRES_DB: "${POSTGRES_DB}"
+            POSTGRES_HOST: "${POSTGRES_HOST}"
+            POSTGRES_PORT: "${POSTGRES_PORT}"
+        working_dir: /code
+        volumes:
+            - ..:/code
+        entrypoint: bash -c "cd /code/ && PYTHONPATH=/code/:$$PYTHONPATH poetry run alembic upgrade head"
+        depends_on:
+            - waitfor-db
+
+    graphql-engine:
+        image: hasura/graphql-engine:v2.2.2.cli-migrations-v2
+        working_dir: /code
+        volumes:
+            - ..:/code
+        ports:
+            - "8080:8080"
+        depends_on:
+            - init-db
+        restart: always
+        environment:
+            HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
+            ## enable the console served by server
+            HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
+            ## enable debugging mode. It is recommended to disable this in production
+            HASURA_GRAPHQL_DEV_MODE: "true"
+            HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+            ACTION_API_DOMAIN: http://backend/
+            <<: *hasura-env-vars
+
+    init-hasura:
+        image: hasura/graphql-engine:v2.2.2.cli-migrations-v2
+        working_dir: /code/hasura
+        volumes:
+            - ..:/code
+        depends_on:
+            - graphql-engine
+        entrypoint: bash -c "/code/scripts/wait-for.sh -t 60 graphql-engine:8080/healthz -- hasura-cli metadata apply"
+        environment:
+            HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080
+            <<: *hasura-env-vars
+
+volumes:
+    web3-db-data:
+    backend:
+        name: "backend"
