@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
     tags=["users"],
     response_model=UsersResponse,
     summary="User registration.",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
     responses={status.HTTP_502_BAD_GATEWAY: {"model": ErrorResponse}},
 )
 async def register(email, username, password):
