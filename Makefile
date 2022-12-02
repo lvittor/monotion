@@ -50,7 +50,7 @@ cp-env: ## Copy docker .env file
 build:
 	DOCKER_BUILDKIT=1 sudo $(DOCKER_COMPOSE_CMD) build
 
-up: ## Start docker-defined services, can be passed specific service(s) to only start those. Usage: make up services="postgres backend"
+up: ## Start docker-defined services, can be passed specific service(s) to only start those. Usage: make up services="mongo backend"
 	$(call log, Starting services...)
 	$(DOCKER_COMPOSE_CMD) up $(services)
 

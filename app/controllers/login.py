@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 )
 async def login():
     log.info("POST /login")
-    
+
     # Login user
 
     return ReadyResponse(status="ok")

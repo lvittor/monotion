@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 )
 async def edit_block(id):
     log.info(f"PUT /block/edit/{id}")
-    
+
     # Edit a block
 
     return ReadyResponse(status="ok")

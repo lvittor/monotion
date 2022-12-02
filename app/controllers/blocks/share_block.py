@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 )
 async def share_block(id):
     log.info(f"POST /block/share/{id}")
-    
+
     # Share a block
 
     return ReadyResponse(status="ok")

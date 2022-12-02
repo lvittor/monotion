@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 )
 async def logout():
     log.info("POST /logout")
-    
+
     # Logout user
 
     return ReadyResponse(status="ok")
