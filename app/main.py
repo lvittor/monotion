@@ -18,9 +18,7 @@ async def on_startup():
     """
     log.debug("Execute FastAPI startup event handler.")
 
-    #if await MongoClient.ping():
     await MongoDBClient.get_client()
-
     AiohttpClient.get_aiohttp_client()
 
 async def on_shutdown():
