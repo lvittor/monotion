@@ -68,7 +68,6 @@ services:
         working_dir: /code
         volumes:
             - ..:/code
-        entrypoint: bash -c "cd /code/ && PYTHONPATH=/code/:$$PYTHONPATH poetry run alembic upgrade head"
         depends_on:
             - waitfor-db
 
