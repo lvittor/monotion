@@ -99,7 +99,7 @@ services:
             - ..:/code
         depends_on:
             - graphql-engine
-        entrypoint: bash -c "/code/scripts/wait-for.sh -t 60 graphql-engine:8080/healthz -- hasura-cli metadata apply"
+        entrypoint: bash -c "/code/scripts/wait-for.sh -t 180 graphql-engine:8080/healthz -- hasura-cli metadata apply"
         environment:
             HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080
             <<: *hasura-env-vars

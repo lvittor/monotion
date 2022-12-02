@@ -5,37 +5,62 @@ from pymongo.errors import ConnectionFailure
 
 from app.settings import settings
 
-class MongoClient:
+class MongoDBClient:
     log: logging.Logger = logging.getLogger(__name__)
-    mongo_client = None
+    client: MongoClient = None
 
     @classmethod
-    def get_client(cls):
-        """Get MongoDB client"""
-        if cls.mongo_client is None:
-            cls.log.info(f"Create MongoDB client with URI: {settings.MONGO_URI}")
-            cls.mongo_client = MongoClient(settings.MONGO_URI)
-        return cls.mongo_client
+    async def get_client(cls) -> MongoClient:
+        """Get MongoDB client.
 
+        Resources:
+            1. https://docs.mongodb.com/manual/reference/connection-string/
+            2. https://pymongo.readthedocs.io/en/stable/api/pymongo/mongo_client.html
 
-    @classmethod
-    async def close_client(cls):
-        """Close MongoDB client"""
-        if cls.mongo_client:
-            await cls.mongo_client.close()
-
+        """
+        cls.log.debug("Get MongoDB client.")
+        if not cls.client:
+            cls.log.debug("Creating MongoDB client.")
+            cls.client = MongoClient(
+                settings.MONGO_URI,
+                serverSelectionTimeoutMS=settings.MONGO_SERVER_SELECTION_TIMEOUT_MS,
+            )
+        return cls.client
     
     @classmethod
-    async def ping(cls):
-        """Ping MongoDB server"""
+    async def close_client(cls) -> None:
+        """Close MongoDB client.
+
+        Resources:
+            1. https://pymongo.readthedocs.io/en/stable/api/pymongo/mongo_client.html
+
+        """
+        if cls.client:
+            cls.log.debug("Closing MongoDB client.")
+            await cls.client.close()
+
+    @classmethod
+    async def ping(cls) -> bool:
+        """Ping MongoDB server.
+
+        Resources:
+            1. https://pymongo.readthedocs.io/en/stable/api/pymongo/mongo_client.html
+
+        """
+        cls.log.debug("Ping MongoDB server.")
         try:
-            await cls.get_client().server_info()
+            return await cls.get_database(settings.MONGO_DB).command('ping')
         except ConnectionFailure:
             cls.log.error("Could not connect to MongoDB")
             return False
-        return True
 
     @classmethod
-    def get_db(cls, db_name: str):
-        """Get MongoDB database"""
-        return cls.get_client()[db_name]
+    async def get_database(cls, database: str) -> MongoClient:
+        """Get MongoDB database.
+
+        Resources:
+            1. https://pymongo.readthedocs.io/en/stable/api/pymongo/mongo_client.html
+
+        """
+        cls.log.debug("Get MongoDB database.")
+        return cls.get_client()[database]
