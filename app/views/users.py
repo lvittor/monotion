@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
-class UsersResponse(BaseModel):
+class UsersModel(BaseModel):
     """Define users response model response.
 
     Attributes:
@@ -42,5 +42,20 @@ class UsersResponse(BaseModel):
                 schema (typing.Dict[str, typing.Any]): The schema dictionary.
 
             """
+            # Override schema description, by default is taken from docstring.
+            schema["description"] = "Users response model."
+
+class UsersResponse(BaseModel):
+
+    user: UsersModel
+
+    def __init__(self, **kwargs):
+        """Initialize ErrorResponse class object instance."""
+        # Neat trick to still use kwargs on ErrorResponse model.
+        super().__init__(user=UsersModel(**kwargs))
+
+    class Config:
+        @staticmethod
+        def schema_extra(schema: Dict[str, Any]) -> None:
             # Override schema description, by default is taken from docstring.
             schema["description"] = "Users response model."

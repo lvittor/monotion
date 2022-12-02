@@ -1,5 +1,6 @@
 """Application implementation - views."""
 from app.views.error import ErrorResponse
 from app.views.ready import ReadyResponse
+from app.views.users import UsersResponse
 
-__all__ = ("ReadyResponse", "ErrorResponse")
+__all__ = ("ReadyResponse", "ErrorResponse", "UsersResponse")
