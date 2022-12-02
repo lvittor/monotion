@@ -21,6 +21,7 @@ async def on_startup():
     await MongoDBClient.get_client()
     AiohttpClient.get_aiohttp_client()
 
+
 async def on_shutdown():
     """Define FastAPI shutdown event handler.
 

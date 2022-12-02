@@ -5,6 +5,7 @@ from pymongo.errors import ConnectionFailure
 
 from app.settings import settings
 
+
 class MongoDBClient:
     log: logging.Logger = logging.getLogger(__name__)
     client: MongoClient = None
@@ -26,7 +27,7 @@ class MongoDBClient:
                 serverSelectionTimeoutMS=settings.MONGO_SERVER_SELECTION_TIMEOUT_MS,
             )
         return cls.client
-    
+
     @classmethod
     async def close_client(cls) -> None:
         """Close MongoDB client.
@@ -50,8 +51,8 @@ class MongoDBClient:
         cls.log.debug("Ping MongoDB server.")
         try:
             return await cls.get_database(settings.MONGO_DB).command('ping')
-        except ConnectionFailure:
-            cls.log.error("Could not connect to MongoDB")
+        except ConnectionFailure as e:
+            cls.log.error(f"Could not connect to MongoDB, stacktrace={e}")
             return False
 
     @classmethod

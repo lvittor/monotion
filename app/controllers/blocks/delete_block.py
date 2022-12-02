@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 )
 async def delete_block(id):
     log.info(f"Delete /block/{id}")
-    
+
     # Delete a block
 
     return ReadyResponse(status="ok")

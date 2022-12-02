@@ -14,14 +14,12 @@ class Settings(BaseSettings):
 
     MONGO_SERVER_SELECTION_TIMEOUT_MS: int = 100
 
-    MONGO_URI: str = (
-        "mongodb://{user}:{password}@{host}:{port}/{database}".format(
-            host=MONGO_HOST,
-            port=MONGO_PORT,
-            user=MONGO_USER,
-            password=MONGO_PASSWORD,
-            database=MONGO_DB,
-        )
+    MONGO_URI: str = "mongodb://{user}:{password}@{host}:{port}/{database}".format(
+        host=MONGO_HOST,
+        port=MONGO_PORT,
+        user=MONGO_USER,
+        password=MONGO_PASSWORD,
+        database=MONGO_DB,
     )
 
 

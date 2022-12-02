@@ -2,11 +2,10 @@
 
 import nox
 
-PYTHON_VERSION = '3.9.12'
 POETRY_VERSION = '1.1.13'
 
 
-@nox.session(reuse_venv=True, python=PYTHON_VERSION)
+@nox.session(reuse_venv=True)
 def cop(session: nox.Session) -> None:
     """Run all pre-commit hooks."""
     session.install(f"poetry=={POETRY_VERSION}")
