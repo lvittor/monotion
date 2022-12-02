@@ -9,8 +9,14 @@ Resources:
 
 from fastapi import APIRouter
 
-from app.controllers import ready, login, logout, register
-from app.controllers.blocks import get_block, create_block, edit_block, delete_block, share_block
+from app.controllers import login, logout, ready, register
+from app.controllers.blocks import (
+    create_block,
+    delete_block,
+    edit_block,
+    get_block,
+    share_block,
+)
 from app.controllers.search import search_content_all
 
 root_api_router = APIRouter(prefix="/api")

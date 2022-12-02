@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 )
 async def register(email, username, password):
     log.info("POST /register")
-    
+
     # Register the user
 
     return UsersResponse(success=True, action="register")
