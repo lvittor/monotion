@@ -3,6 +3,7 @@ import logging
 from fastapi import APIRouter, status
 
 from app.exceptions.http import HTTPException
+from app.settings import settings
 from app.utils import MongoDBClient
 from app.views import ErrorResponse, ReadyResponse
 
@@ -30,4 +31,4 @@ async def ready():
             ).dict(exclude_none=True),
         )
 
-    return ReadyResponse(status="ok")
+    return ReadyResponse(status=f"ok")
