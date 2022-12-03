@@ -22,5 +22,8 @@ class Settings(BaseSettings):
         database=MONGO_DB,
     )
 
+    SECRET_KEY: str = os.getenv("SECRET_KEY")
+    ALGORITHM: str = os.getenv("ALGORITHM")
+
 
 settings = Settings()

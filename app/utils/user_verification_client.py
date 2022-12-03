@@ -1,20 +1,17 @@
 from datetime import datetime, timedelta
 from typing import Union
 
-from passlib.context import CryptContext
-from jose import JWTError, jwt
-
-from app.utils import MongoDBClient
-
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 
 from app.models import TokenData
-
-SECRET_KEY = "2e98402584bcf9bb7e5c10741522ca12f3842e865e2c91a8b5df052008c2d51f"
-ALGORITHM = "HS256"
+from app.settings import settings
+from app.utils import MongoDBClient
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 class UserVerificationClient:
 
@@ -36,7 +33,11 @@ class UserVerificationClient:
         return cls.verify_password(password, user_password)
 
     @classmethod
-    async def get_current_user(cls, token: str = Depends(oauth2_scheme), database=Depends(MongoDBClient.get_database)):
+    async def get_current_user(
+        cls,
+        token: str = Depends(oauth2_scheme),
+        database=Depends(MongoDBClient.get_database),
+    ):
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -44,7 +45,9 @@ class UserVerificationClient:
         )
 
         try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            payload = jwt.decode(
+                token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+            )
             email: str = payload.get("sub")
             if email is None:
                 raise credentials_exception
@@ -58,12 +61,16 @@ class UserVerificationClient:
         return user
 
     @classmethod
-    def create_access_token(cls, data: dict, expires_delta: Union[timedelta, None] = None):
+    def create_access_token(
+        cls, data: dict, expires_delta: Union[timedelta, None] = None
+    ):
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + expires_delta
         else:
             expire = datetime.utcnow() + timedelta(minutes=15)
         to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        encoded_jwt = jwt.encode(
+            to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        )
         return encoded_jwt
