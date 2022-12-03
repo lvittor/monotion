@@ -6,7 +6,7 @@ from app.exceptions.http import HTTPException, http_exception_handler
 from app.router import root_api_router
 from app.settings import settings
 from app.utils.aiohttp_client import AiohttpClient
-from pymongo import MongoClient
+from app.utils.mongo_client import MongoDBClient
 
 
 async def on_startup():
@@ -17,11 +17,8 @@ async def on_startup():
 
     """
     log.debug("Execute FastAPI startup event handler.")
-    print(settings.MONGO_URI)
-    app.mongodb_client = MongoClient(settings.MONGO_URI)
-    app.database = app.mongodb_client[settings.MONGO_DB]
-    # ping MongoDB
-    app.database["mongodb"].insert_one({"ping": "pong"})
+
+    await MongoDBClient.get_client()
     AiohttpClient.get_aiohttp_client()
 
 
@@ -34,7 +31,7 @@ async def on_shutdown():
     """
     log.debug("Execute FastAPI shutdown event handler.")
 
-    app.mongodb_client.close()
+    await MongoDBClient.close_client()
     await AiohttpClient.close_aiohttp_client()
 
 

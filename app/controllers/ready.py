@@ -3,9 +3,9 @@ import logging
 from fastapi import APIRouter, status
 
 from app.exceptions.http import HTTPException
+from app.settings import settings
 from app.utils import MongoDBClient
 from app.views import ErrorResponse, ReadyResponse
-from app.settings import settings
 
 router = APIRouter()
 log = logging.getLogger(__name__)
@@ -31,4 +31,4 @@ async def ready():
             ).dict(exclude_none=True),
         )
 
-    return ReadyResponse(status=f"{settings.MONGO_URI}")
+    return ReadyResponse(status=f"ok")
