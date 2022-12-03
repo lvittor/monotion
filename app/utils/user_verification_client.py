@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from app.models import TokenData
+from app.models import TokenData, User
 from app.settings import settings
 from app.utils import MongoDBClient
 from app.views import ErrorResponse
@@ -61,9 +61,11 @@ class UserVerificationClient:
         except JWTError:
             raise credentials_exception
 
-        user = database.users.find_one(email=token_data.email)
-        if not user:
+        found = database.users.find_one({"email" : token_data.email})
+        if not found:
             raise credentials_exception
+
+        user = User(**found)
         return user
 
     @classmethod

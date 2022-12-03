@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, Depends, status
 
-from app.exceptions.http import HTTPException, E
+from app.exceptions.http import HTTPException
 from app.models import BlockRequest, User
 from app.utils import MongoDBClient, UserVerificationClient
 from app.views import ErrorResponse, ReadyResponse

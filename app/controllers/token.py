@@ -27,7 +27,6 @@ async def token(
     database=Depends(MongoDBClient.get_database),
 ):
     log.info("POST /token")
-    print("POST /token")
     email = form_data.username
     password = form_data.password
 
