@@ -1,12 +1,11 @@
 import logging
-from uuid import uuid4
 
 from fastapi import APIRouter, Depends, status
 from pymongo.errors import DuplicateKeyError
 
 from app.exceptions.http import HTTPException
 from app.models import User
-from app.utils import MongoDBClient
+from app.utils import MongoDBClient, UserVerificationClient
 from app.views import ErrorResponse, UsersResponse
 
 router = APIRouter()
@@ -25,13 +24,11 @@ async def register(
     email, username, password, database=Depends(MongoDBClient.get_database)
 ):
     log.info("POST /register")
-    user = User(
-        email=email, username=username, password=password
-    )  # TODO: HASH PASSWORD
+    hashed_password = UserVerificationClient.get_password_hash(password)
+    user = User(email=email, username=username, password=hashed_password)
     try:
-        user_id = database.users.insert_one(user.dict())
-        log.debug(database.users.find_one({"_id": user_id.inserted_id}))
-    except DuplicateKeyError as e:
+        database.users.insert_one(user.dict())
+    except DuplicateKeyError:
         log.error(f"User with email: {email} already exists.")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -42,9 +39,5 @@ async def register(
         )
     return UsersResponse(
         success=True,
-        properties={
-            "email": f"{email}",
-            "username": f"{username}",
-            "password": f"{password}",
-        },
+        properties=user.dict(exclude_none=True),
     )

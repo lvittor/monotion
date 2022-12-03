@@ -594,7 +594,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "multidict"
-version = "6.0.2"
+version = "6.0.3"
 description = "multidict implementation"
 category = "main"
 optional = false
@@ -686,6 +686,20 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
+
+[[package]]
+name = "passlib"
+version = "1.7.4"
+description = "comprehensive password hashing framework supporting over 30 schemes"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+argon2 = ["argon2-cffi (>=18.2.0)"]
+bcrypt = ["bcrypt (>=3.1.0)"]
+build_docs = ["sphinx (>=1.6)", "sphinxcontrib-fulltoc (>=1.2.0)", "cloud-sptheme (>=1.10.1)"]
+totp = ["cryptography"]
 
 [[package]]
 name = "pathspec"
@@ -1382,7 +1396,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "97a0f29b130e095806632e59422068e8fb80b6ad10f3c7e3cff4a82ca94d7a67"
+content-hash = "34fc1212fd3cda267cff9c6aa3ae3014e72def203f1dfd0e25cf76b5b31fe208"
 
 [metadata.files]
 aiohttp = []
@@ -1442,6 +1456,7 @@ myst-parser = []
 nodeenv = []
 nox = []
 packaging = []
+passlib = []
 pathspec = []
 pdbpp = []
 platformdirs = []
