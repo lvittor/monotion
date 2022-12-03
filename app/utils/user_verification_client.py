@@ -59,7 +59,7 @@ class UserVerificationClient:
         except JWTError:
             raise credentials_exception
 
-        user = database.users.find_one(email=token_data.email)
+        user = database.users.find_one({"email": token_data.email})
         if not user:
             raise credentials_exception
         return user
