@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, status
+from pydantic.error_wrappers import ValidationError
 from pymongo.errors import DuplicateKeyError
 
 from app.exceptions.http import HTTPException
@@ -25,8 +26,8 @@ async def register(
 ):
     log.info("POST /register")
     hashed_password = UserVerificationClient.get_password_hash(password)
-    user = User(email=email, username=username, password=hashed_password)
     try:
+        user = User(email=email, username=username, password=hashed_password)
         database.users.insert_one(user.dict())
     except DuplicateKeyError:
         log.error(f"User with email: {email} already exists.")
@@ -35,6 +36,15 @@ async def register(
             content=ErrorResponse(
                 code=status.HTTP_409_CONFLICT,
                 message="User already exists.",
+            ).dict(exclude_none=True),
+        )
+    except ValidationError:
+        log.error(f"Email: {email} is not valid.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=ErrorResponse(
+                code=status.HTTP_400_BAD_REQUEST,
+                message=f"The email {email} is not a valid email.",
             ).dict(exclude_none=True),
         )
     return UsersResponse(

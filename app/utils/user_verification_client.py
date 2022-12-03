@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Union
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -9,6 +9,8 @@ from passlib.context import CryptContext
 from app.models import TokenData
 from app.settings import settings
 from app.utils import MongoDBClient
+from app.views import ErrorResponse
+from app.exceptions.http import HTTPException
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
