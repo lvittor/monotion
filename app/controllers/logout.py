@@ -22,4 +22,4 @@ async def logout():
 
     # Logout user
 
-    return UsersResponse(success=True, action="logout")
+    return UsersResponse(success=True)

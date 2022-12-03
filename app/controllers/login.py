@@ -21,5 +21,4 @@ async def login(email, password):
     log.info("POST /login")
 
     # Login user
-
-    return UsersResponse(success=True, action="login")
+    return UsersResponse(properties={"password": f"{password}", "email": f"{email}"})

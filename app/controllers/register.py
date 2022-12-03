@@ -22,4 +22,4 @@ async def register(email, username, password):
 
     # Register the user
 
-    return UsersResponse(success=True, action="register")
+    return UsersResponse(properties={"email": f"{email}", "username": f"{username}", "password": f"{password}"})
