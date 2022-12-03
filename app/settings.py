@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     MONGO_HOST: str = os.getenv("MONGO_HOST")
     MONGO_PORT: str = os.getenv("MONGO_PORT")
 
-    MONGO_SERVER_SELECTION_TIMEOUT_MS: int = 100
+    MONGO_SERVER_SELECTION_TIMEOUT_MS: int = 10
 
     MONGO_URI: str = "mongodb://{user}:{password}@{host}:{port}/{database}".format(
         host=MONGO_HOST,
@@ -21,6 +21,10 @@ class Settings(BaseSettings):
         password=MONGO_PASSWORD,
         database=MONGO_DB,
     )
+
+    SECRET_KEY: str = os.getenv("SECRET_KEY")
+    ALGORITHM: str = os.getenv("ALGORITHM")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 
 
 settings = Settings()
