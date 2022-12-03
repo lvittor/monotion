@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     MONGO_SERVER_SELECTION_TIMEOUT_MS: int = 100
 
-    MONGO_URI: str = "mongodb://{user}:{password}@{host}:{port}/{database}".format(
+    MONGO_URI: str = "mongodb://{user}:{password}@{host}:{port}/?authSource={database}&authMechanism=SCRAM-SHA-256".format(
         host=MONGO_HOST,
         port=MONGO_PORT,
         user=MONGO_USER,
