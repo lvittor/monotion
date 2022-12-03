@@ -31,6 +31,10 @@ services:
             MONGO_DB: "${MONGO_DB}"
             MONGO_HOST: "${MONGO_HOST}"
             MONGO_PORT: "${MONGO_PORT}"
+            SECRET_KEY: "${SECRET_KEY}"
+            ALGORITHM: "${ALGORITHM}"
+            ACCESS_TOKEN_EXPIRE_MINUTES: "${ACCESS_TOKEN_EXPIRE_MINUTES}"
+            MONGO_SERVER_SELECTION_TIMEOUT_MS: "${MONGO_SERVER_SELECTION_TIMEOUT_MS}"
     
     mongo:
         image: mongo:4.4.4
@@ -56,12 +60,14 @@ services:
 
 
     waitfor-db:
+        container_name: waitfor-db
         image: dadarek/wait-for-dependencies
         depends_on:
             - mongo
         command: mongo:27017
 
     init-db:
+        container_name: init-db
         image: ${COMPOSE_PROJECT_NAME}:latest
         build:
             context: ../

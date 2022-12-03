@@ -1,21 +1,16 @@
+from datetime import timedelta
 import logging
 
-from datetime import timedelta
-
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, Depends, status
 
 from app.exceptions.http import HTTPException
-from app.views import ErrorResponse, UsersResponse
+from app.models import Token, User
+from app.settings import settings
 from app.utils import MongoDBClient, UserVerificationClient
-#token should be a view?
-from app.models import User, Token
-
+from app.views import ErrorResponse, UsersResponse
 
 router = APIRouter()
 log = logging.getLogger(__name__)
-
-
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 @router.post(
@@ -30,7 +25,7 @@ async def login(email, password, database=Depends(MongoDBClient.get_database)):
     log.info("POST /login")
 
     found = database.users.find_one({"email": email})
-    
+
     if found is None:
         log.error(f"Incorrect username or password.")
         raise HTTPException(
@@ -43,7 +38,7 @@ async def login(email, password, database=Depends(MongoDBClient.get_database)):
         )
 
     user = User(**found)
-    
+
     if not UserVerificationClient.verify_user(user.password, password):
         log.error(f"Incorrect username or password.")
         raise HTTPException(
@@ -54,9 +49,11 @@ async def login(email, password, database=Depends(MongoDBClient.get_database)):
             ).dict(exclude_none=True),
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = UserVerificationClient.create_access_token(data={"sub": user.email}, expires_delta=access_token_expires)
+
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = UserVerificationClient.create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
 
     # Login user
     return Token(access_token=access_token, token_type="bearer")
