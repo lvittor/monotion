@@ -1075,6 +1075,17 @@ pycrypto = ["pycrypto (>=2.6.0,<2.7.0)", "pyasn1"]
 pycryptodome = ["pycryptodome (>=3.3.1,<4.0.0)", "pyasn1"]
 
 [[package]]
+name = "python-multipart"
+version = "0.0.5"
+description = "A streaming multipart parser for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+six = ">=1.4.0"
+
+[[package]]
 name = "pytz"
 version = "2022.6"
 description = "World timezone definitions, modern and historical"
@@ -1487,7 +1498,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11"
-content-hash = "88eb7f4f7dda0026b77e1f7b831ca616868ea00286fc6b4fa63d8c94aacd817d"
+content-hash = "cb733756f4613c7cf4cef86eaaaa8e94903e495e62ad54df460da717646995fb"
 
 [metadata.files]
 aiohttp = []
@@ -1577,6 +1588,7 @@ pytest-xdist = []
 python-dateutil = []
 python-dotenv = []
 python-jose = []
+python-multipart = []
 pytz = []
 pyyaml = []
 requests = []

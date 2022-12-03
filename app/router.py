@@ -9,7 +9,7 @@ Resources:
 
 from fastapi import APIRouter
 
-from app.controllers import login, logout, ready, register
+from app.controllers import logout, ready, register, token
 from app.controllers.blocks import (
     create_block,
     delete_block,
@@ -19,10 +19,10 @@ from app.controllers.blocks import (
 )
 from app.controllers.search import search_content_all
 
-root_api_router = APIRouter(prefix="/api")
+root_api_router = APIRouter()
 root_api_router.include_router(ready.router, tags=["ready"])
 
-root_api_router.include_router(login.router, tags=["users"])
+root_api_router.include_router(token.router, tags=["users"])
 root_api_router.include_router(logout.router, tags=["users"])
 root_api_router.include_router(register.router, tags=["users"])
 
