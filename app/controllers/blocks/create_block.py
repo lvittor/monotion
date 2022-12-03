@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 )
 async def create_block(id):
     log.info("POST /block/create")
-    
+
     # Create a block
 
     return ReadyResponse(status="ok")

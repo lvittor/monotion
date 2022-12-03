@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 )
 async def search_content_all():
     log.info(f"GET /search/content/all")
-    
+
     # Get the content
 
     return ReadyResponse(status="ok")

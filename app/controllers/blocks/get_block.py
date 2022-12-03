@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 )
 async def get_block(id):
     log.info(f"GET /block/{id}")
-    
+
     # Get block id
 
     return ReadyResponse(status="ok")
