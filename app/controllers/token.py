@@ -2,6 +2,7 @@ from datetime import timedelta
 import logging
 
 from fastapi import APIRouter, Depends, status
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.exceptions.http import HTTPException
 from app.models import Token, User
@@ -14,19 +15,25 @@ log = logging.getLogger(__name__)
 
 
 @router.post(
-    "/login",
+    "/token",
     tags=["users"],
     response_model=Token,
     summary="User login.",
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_502_BAD_GATEWAY: {"model": ErrorResponse}},
 )
-async def login(email, password, database=Depends(MongoDBClient.get_database)):
-    log.info("POST /login")
+async def token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    database=Depends(MongoDBClient.get_database),
+):
+    log.info("POST /token")
+    print("POST /token")
+    email = form_data.username
+    password = form_data.password
 
     found = database.users.find_one({"email": email})
 
-    if found is None:
+    if not found:
         log.error(f"Incorrect username or password.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
