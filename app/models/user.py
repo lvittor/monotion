@@ -1,22 +1,21 @@
 from typing import Optional
+from uuid import uuid4
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import UUID4, BaseModel, EmailStr, Field
 
 
 class User(BaseModel):
-    id: str = Field(..., alias="_id")
     email: EmailStr = Field(..., alias="email")
     username: str = Field(..., alias="name")
     password: str = Field(..., alias="password")
-    ownerPages: Optional[list] = Field(..., alias="ownerPages")
-    editorPages: Optional[list] = Field(..., alias="editorPages")
-    viewerPages: Optional[list] = Field(..., alias="viewerPages")
+    ownerPages: Optional[list] = Field(None, alias="ownerPages")
+    editorPages: Optional[list] = Field(None, alias="editorPages")
+    viewerPages: Optional[list] = Field(None, alias="viewerPages")
 
     class Config:
         allow_population_by_field_name = True
         schema_extra = {
             "example": {
-                "_id": "1",
                 "email": "example@gmail.com",
                 "username": "user",
                 "password": "password",

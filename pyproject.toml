@@ -7,7 +7,7 @@ authors = ["lvvittor <lvvittor@gmail.com>"]
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
 fastapi = ">=0.68.0"
-pydantic = ">=1.8.0,<2.0.0"
+pydantic = {extras = ["email"], version = "^1.10.2"}
 uvicorn = { extras = ["standard"], version = "^0.16.0" }
 fastapi-utils = "^0.2.1"
 aiohttp = "^3.8.3"

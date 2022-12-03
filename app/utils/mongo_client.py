@@ -1,6 +1,6 @@
 import logging
 
-from pymongo import MongoClient
+from pymongo import ASCENDING, MongoClient
 from pymongo.errors import ConnectionFailure
 
 from app.settings import settings
@@ -61,4 +61,6 @@ class MongoDBClient:
         """
         cls.log.info(f"Getting MongoDB database: {settings.MONGO_DB}")
         client = await cls.get_client()
-        return client[settings.MONGO_DB]
+        database = client[settings.MONGO_DB]
+        database.users.create_index([('email', ASCENDING)], unique=True)
+        return database

@@ -1,10 +1,11 @@
 from typing import Optional
+import uuid
 
 from pydantic import BaseModel, Field
 
 
 class Block(BaseModel):
-    id: str = Field(..., alias="_id")
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
     type: str = Field(..., alias="type")
     properties: str = Field(..., alias="properties")
     content: Optional[list] = Field(..., alias="content")
