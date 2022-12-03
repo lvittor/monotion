@@ -16,7 +16,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 class UserVerificationClient:
 
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+    
     @classmethod
     def verify_password(cls, plain_password: str, hashed_password: str) -> bool:
         """Verify password."""
@@ -36,12 +36,16 @@ class UserVerificationClient:
     async def get_current_user(
         cls,
         token: str = Depends(oauth2_scheme),
-        database=Depends(MongoDBClient.get_database),
+        database = Depends(MongoDBClient.get_database),
     ):
+        """Get current user."""
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+            content=ErrorResponse(
+                code=status.HTTP_401_UNAUTHORIZED,
+                message="Could not validate credentials.",
+                headers={"WWW-Authenticate": "Bearer"},
+            ).dict(exclude_none=True),
         )
 
         try:
@@ -49,14 +53,14 @@ class UserVerificationClient:
                 token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
             )
             email: str = payload.get("sub")
-            if email is None:
+            if not email:
                 raise credentials_exception
             token_data = TokenData(email=email)
         except JWTError:
             raise credentials_exception
 
         user = database.users.find_one(email=token_data.email)
-        if user is None:
+        if not user:
             raise credentials_exception
         return user
 
@@ -64,6 +68,7 @@ class UserVerificationClient:
     def create_access_token(
         cls, data: dict, expires_delta: Union[timedelta, None] = None
     ):
+        """Create access token."""
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + expires_delta

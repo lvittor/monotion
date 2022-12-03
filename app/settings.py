@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     MONGO_HOST: str = os.getenv("MONGO_HOST")
     MONGO_PORT: str = os.getenv("MONGO_PORT")
 
-    MONGO_SERVER_SELECTION_TIMEOUT_MS: os.getenv("MONGO_SERVER_SELECTION_TIMEOUT_MS")
+    MONGO_SERVER_SELECTION_TIMEOUT_MS: int = 10
 
     MONGO_URI: str = "mongodb://{user}:{password}@{host}:{port}/{database}".format(
         host=MONGO_HOST,

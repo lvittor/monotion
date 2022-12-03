@@ -30,11 +30,11 @@ async def login(email, password, database=Depends(MongoDBClient.get_database)):
         log.error(f"Incorrect username or password.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
+            headers={"WWW-Authenticate": "Bearer"},
             content=ErrorResponse(
                 code=status.HTTP_401_UNAUTHORIZED,
                 message="Incorrect username or password.",
             ).dict(exclude_none=True),
-            headers={"WWW-Authenticate": "Bearer"},
         )
 
     user = User(**found)
@@ -43,11 +43,11 @@ async def login(email, password, database=Depends(MongoDBClient.get_database)):
         log.error(f"Incorrect username or password.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
+            headers={"WWW-Authenticate": "Bearer"},
             content=ErrorResponse(
                 code=status.HTTP_401_UNAUTHORIZED,
                 message="Incorrect username or password.",
             ).dict(exclude_none=True),
-            headers={"WWW-Authenticate": "Bearer"},
         )
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
