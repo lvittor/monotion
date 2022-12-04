@@ -19,15 +19,19 @@ log = logging.getLogger(__name__)
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_502_BAD_GATEWAY: {"model": ErrorResponse}},
 )
-async def unregister(email, database=Depends(MongoDBClient.get_database)):
+async def unregister(
+    user: User = Depends(UserVerificationClient.get_current_user),
+    database=Depends(MongoDBClient.get_database)
+):
     log.info("POST /unregister")
 
-    found = database.users.find_one({"email": email})
-    response = database.users.delete_one({"_id": found["_id"]})
+    found = database.users.find_one({"email": user.email})
+    database.users.delete_one({"_id": found["_id"]})
 
-    if not response.acknowledged:
-        # raise exception as invalid operation was triggered
-        raise HTTPException()
+    # Podríamos catchear la excepción de la base de datos en caso de que no se pueda
+    # hacer la modificación
+    # if not response.acknowledged:
+    #     raise Exception:
 
     deleted_user = {
         "deleted_user": {
