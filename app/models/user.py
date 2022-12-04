@@ -24,3 +24,6 @@ class User(BaseModel):
                 "viewerPages": ["5das7qh1", "8xcaxy21"],
             }
         }
+
+    def get_all_allowed_blocks(self):
+        return self.ownerPages + self.viewerPages + self.editorPages
