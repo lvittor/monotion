@@ -12,7 +12,7 @@ from app.views import BaseResponse, ErrorResponse
 router = APIRouter()
 log = logging.getLogger(__name__)
 
-
+# TODO: You must only register only if you are not logged in
 @router.post(
     "/register",
     tags=["users"],

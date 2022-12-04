@@ -9,6 +9,7 @@ from fastapi import Depends
 from pydantic import BaseModel, Field, validator
 from pymongo import MongoClient
 
+from app.exceptions.http import HTTPException
 from app.utils import MongoDBClient
 
 
@@ -89,7 +90,7 @@ class PydanticObjectId(ObjectId):
             raise TypeError(f"Get type {type(v)} instead of ObjectId or str")
         elif not ObjectId.is_valid(v):
             raise ValueError(f"The parent id {v} is not a valid ObjectId")
-        return v
+        return ObjectId(v)
 
     @classmethod
     def __modify_schema__(cls, field_schema):
@@ -116,16 +117,19 @@ class BaseBlock(BaseModel):
         return json.loads(json_util.dumps(self.__dict__))
 
     def is_page(self):
-        return self.type == BlockType.PAGE
+        return self.type == BlockType.PAGE.value
 
     def is_valid_page(self):
         return self.is_page() and self.parent is None
 
     async def has_valid_parent(self):
         """Check if parent is None or exists in the database."""
+        if not self.parent:
+            return self.is_page()
+
+        # Block has a parent. So, check if it exists in the database
         database: MongoClient = await MongoDBClient.get_database()
-        parent_id_in_db = database.blocks.find_one({"_id": self.parent})
-        return self.parent is None or parent_id_in_db is not None
+        return database.blocks.find_one({"_id": self.parent})
 
     async def is_valid_block(self):
         """
@@ -159,7 +163,7 @@ class Block(BaseBlock):
                 "properties": {"title": "Hello World", "checked": "No"},
                 "content": ["00315dfb", "bf2d3c32", "3070827f"],
                 "editors": ["1", "2"],
-                "parent": "2a59gah6",
+                "parent": "638c2fde3d4ef9116671fd4a",
             }
         }
 

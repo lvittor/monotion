@@ -28,14 +28,18 @@ async def create_block(
     log.info("POST /block/create")
 
     current_user_id = database.users.find_one({"email": current_user['email']})['_id']
-    log.error(f"Current blockRequest: {blockRequest.dict()}")
     block = Block(**blockRequest.dict(), editors=[current_user_id])
     if await block.is_valid_block():
         block_id = database.blocks.insert_one(block.dict()).inserted_id
         if block.is_valid_page():  # Update the user's owner page list.
             database.users.update_one(
-                {"_id": current_user.id},
-                {"$push": {"ownerPages": block.id}},
+                {"_id": current_user_id},
+                {"$push": {"ownerPages": block_id}},
+            )
+        if block.parent:  # Update the parent block's children (i.e. content) list.
+            database.blocks.update_one(
+                {"_id": block.parent},
+                {"$push": {"content": block_id}},
             )
     else:
         log.error(
