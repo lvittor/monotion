@@ -8,7 +8,7 @@ from app.exceptions.http import HTTPException
 from app.models import Token, User
 from app.settings import settings
 from app.utils import MongoDBClient, UserVerificationClient
-from app.views import ErrorResponse, UsersResponse
+from app.views import BaseResponse, ErrorResponse
 
 router = APIRouter()
 log = logging.getLogger(__name__)
@@ -27,7 +27,6 @@ async def token(
     database=Depends(MongoDBClient.get_database),
 ):
     log.info("POST /token")
-    print("POST /token")
     email = form_data.username
     password = form_data.password
 

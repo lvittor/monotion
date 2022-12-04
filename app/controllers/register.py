@@ -7,16 +7,16 @@ from pymongo.errors import DuplicateKeyError
 from app.exceptions.http import HTTPException
 from app.models import User
 from app.utils import MongoDBClient, UserVerificationClient
-from app.views import ErrorResponse, UsersResponse
+from app.views import BaseResponse, ErrorResponse
 
 router = APIRouter()
 log = logging.getLogger(__name__)
 
-
+# TODO: You must only register only if you are not logged in
 @router.post(
     "/register",
     tags=["users"],
-    response_model=UsersResponse,
+    response_model=BaseResponse,
     summary="User registration.",
     status_code=status.HTTP_201_CREATED,
     responses={status.HTTP_502_BAD_GATEWAY: {"model": ErrorResponse}},
@@ -47,7 +47,7 @@ async def register(
                 message=f"The email {email} is not a valid email.",
             ).dict(exclude_none=True),
         )
-    return UsersResponse(
+    return BaseResponse(
         success=True,
         properties=user.dict(exclude_none=True),
     )
