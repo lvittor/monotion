@@ -10,5 +10,5 @@ __all__ = (
     "Token",
     "BlockRequest",
     "BlockType",
-    BaseBlock,
+    "BaseBlock",
 )
