@@ -6,11 +6,11 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
+from app.exceptions.http import HTTPException
 from app.models import TokenData
 from app.settings import settings
 from app.utils import MongoDBClient
 from app.views import ErrorResponse
-from app.exceptions.http import HTTPException
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -18,7 +18,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 class UserVerificationClient:
 
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    
+
     @classmethod
     def verify_password(cls, plain_password: str, hashed_password: str) -> bool:
         """Verify password."""
@@ -38,7 +38,7 @@ class UserVerificationClient:
     async def get_current_user(
         cls,
         token: str = Depends(oauth2_scheme),
-        database = Depends(MongoDBClient.get_database),
+        database=Depends(MongoDBClient.get_database),
     ):
         """Get current user."""
         credentials_exception = HTTPException(
@@ -60,8 +60,7 @@ class UserVerificationClient:
             token_data = TokenData(email=email)
         except JWTError:
             raise credentials_exception
-
-        user = database.users.find_one(email=token_data.email)
+        user = database.users.find_one({"email": token_data.email})
         if not user:
             raise credentials_exception
         return user

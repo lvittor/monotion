@@ -1,7 +1,10 @@
 from enum import Enum
-from typing import Optional
+import json
+from typing import Dict, Optional
 import uuid
 
+from bson import json_util
+from bson.objectid import ObjectId
 from pydantic import BaseModel, Field
 
 
@@ -71,22 +74,43 @@ class BlockType(Enum):  # TODO: define scope of block types
     CANVAS_PAGE = "canvas_page"
 
 
-class Block(BaseModel):
+class PydanticObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not isinstance(v, ObjectId):
+            raise TypeError('ObjectId required')
+        return ObjectId(v)
+
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type="dict")
+
+
+class DumpData:
+    def to_json(self):
+        return json.loads(json_util.dumps(self.__dict__))
+
+
+class Block(BaseModel, DumpData):
     type: BlockType = Field(..., alias="type")
-    properties: str = Field(..., alias="properties")
-    content: Optional[list] = Field(..., alias="content")
-    editors: Optional[list] = Field(..., alias="editors")
-    parent: Optional[str] = Field(None, alias="parent")
+    properties: Dict = Field(..., alias="properties")
+    content: Optional[list[PydanticObjectId]] = Field(..., alias="content")
+    editors: Optional[list[PydanticObjectId]] = Field(..., alias="editors")
+    parent: Optional[PydanticObjectId] = Field(None, alias="parent")
 
     class Config:
         allow_population_by_field_name = True
+        use_enum_values = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: lambda v: str(v)}
         schema_extra = {
             "example": {
                 "type": "to_do",
-                "properties": """{
-                        "title": "Hello World",
-                        "checked": "No"
-                    }""",
+                "properties": {"title": "Hello World", "checked": "No"},
                 "content": ["00315dfb", "bf2d3c32", "3070827f"],
                 "editors": ["1", "2"],
                 "parent": "2a59gah6",
@@ -96,10 +120,11 @@ class Block(BaseModel):
 
 class BlockRequest(BaseModel):
     type: BlockType = Field(..., alias="type")
-    properties: str = Field(..., alias="properties")
+    properties: Dict = Field(..., alias="properties")
 
     class Config:
         allow_population_by_field_name = True
+        use_enum_values = True
         schema_extra = {
             "example": {
                 "type": "to_do",
