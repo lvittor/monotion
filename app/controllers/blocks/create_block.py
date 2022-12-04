@@ -26,23 +26,29 @@ async def create_block(
     current_user: User = Depends(UserVerificationClient.get_current_user),
 ):
     log.info("POST /block/create")
+
     current_user_id = database.users.find_one({"email": current_user['email']})['_id']
-    print(type(current_user_id))
-    block = Block(
-        type=blockRequest.type,
-        properties=blockRequest.properties,
-        content=[],  # TODO: add content
-        editors=[current_user_id],
-        parent=None,  # TODO: add parent
-    )
-    print(block)
-    print(block.dict())
-    database.blocks.insert_one(block.dict())
-    if block.type is BlockType.PAGE:
-        database.users.update_one(
-            # Update the user's owner page list.
-            {"_id": current_user.id},
-            {"$push": {"ownerPages": block.id}},
+    log.error(f"Current blockRequest: {blockRequest.dict()}")
+    block = Block(**blockRequest.dict(), editors=[current_user_id])
+    if await block.is_valid_block():
+        block_id = database.blocks.insert_one(block.dict()).inserted_id
+        if block.is_valid_page():  # Update the user's owner page list.
+            database.users.update_one(
+                {"_id": current_user.id},
+                {"$push": {"ownerPages": block.id}},
+            )
+    else:
+        log.error(
+            f"Block is invalid. Please check the blockRequest: {blockRequest.dict()}"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=ErrorResponse(
+                code=status.HTTP_400_BAD_REQUEST,
+                message=f"Block is invalid. Please check the blockRequest: {blockRequest.dict()}",
+            ).dict(exclude_none=True),
         )
 
-    return BaseResponse(success=True, properties=block.to_json())
+    return BaseResponse(
+        success=True, properties={"block_id": str(block_id), "block": block.to_json()}
+    )

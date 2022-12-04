@@ -1,11 +1,15 @@
 from enum import Enum
 import json
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 import uuid
 
 from bson import json_util
 from bson.objectid import ObjectId
-from pydantic import BaseModel, Field
+from fastapi import Depends
+from pydantic import BaseModel, Field, validator
+from pymongo import MongoClient
+
+from app.utils import MongoDBClient
 
 
 class BlockType(Enum):  # TODO: define scope of block types
@@ -81,26 +85,68 @@ class PydanticObjectId(ObjectId):
 
     @classmethod
     def validate(cls, v):
-        if not isinstance(v, ObjectId):
-            raise TypeError('ObjectId required')
-        return ObjectId(v)
+        if not isinstance(v, str) and not isinstance(v, ObjectId):
+            raise TypeError(f"Get type {type(v)} instead of ObjectId or str")
+        elif not ObjectId.is_valid(v):
+            raise ValueError(f"The parent id {v} is not a valid ObjectId")
+        return v
 
     @classmethod
     def __modify_schema__(cls, field_schema):
-        field_schema.update(type="dict")
+        field_schema.update(type="string")
 
 
-class DumpData:
+class BaseBlock(BaseModel):
+    type: BlockType = Field(..., alias="type")
+    properties: Dict = Field(..., alias="properties")
+    parent: Optional[PydanticObjectId] = Field(None, alias="parent")
+
+    class Config:
+        allow_population_by_field_name = True
+        use_enum_values = True
+        schema_extra = {
+            "example": {
+                "type": "to_do",
+                "properties": {"title": "Hello World", "checked": "No"},
+                "parent": "638c1390af999d33f67f16f5",
+            }
+        }
+
     def to_json(self):
         return json.loads(json_util.dumps(self.__dict__))
 
+    def is_page(self):
+        return self.type == BlockType.PAGE
 
-class Block(BaseModel, DumpData):
-    type: BlockType = Field(..., alias="type")
-    properties: Dict = Field(..., alias="properties")
-    content: Optional[list[PydanticObjectId]] = Field(..., alias="content")
-    editors: Optional[list[PydanticObjectId]] = Field(..., alias="editors")
-    parent: Optional[PydanticObjectId] = Field(None, alias="parent")
+    def is_valid_page(self):
+        return self.is_page() and self.parent is None
+
+    async def has_valid_parent(self):
+        """Check if parent is None or exists in the database."""
+        database: MongoClient = await MongoDBClient.get_database()
+        parent_id_in_db = database.blocks.find_one({"_id": self.parent})
+        return self.parent is None or parent_id_in_db is not None
+
+    async def is_valid_block(self):
+        """
+        Check if block is valid before inserting it into the database.
+        It's difficult to implement since we need to define the scope of block types and their properties.
+        """
+        return (
+            await self.has_valid_parent() and True
+        )  # We need to do more validations here
+
+
+class Block(BaseBlock):
+    content: Optional[List[PydanticObjectId]] = Field(
+        default_factory=list, alias="content", uniqueItems=True
+    )
+    editors: Optional[List[PydanticObjectId]] = Field(
+        default_factory=list, alias="editors", uniqueItems=True
+    )
+
+    def __init__(self, **data):
+        super().__init__(**data)
 
     class Config:
         allow_population_by_field_name = True
@@ -118,16 +164,5 @@ class Block(BaseModel, DumpData):
         }
 
 
-class BlockRequest(BaseModel):
-    type: BlockType = Field(..., alias="type")
-    properties: Dict = Field(..., alias="properties")
-
-    class Config:
-        allow_population_by_field_name = True
-        use_enum_values = True
-        schema_extra = {
-            "example": {
-                "type": "to_do",
-                "properties": {"title": "Hello World", "checked": "No"},
-            }
-        }
+class BlockRequest(BaseBlock):
+    pass
