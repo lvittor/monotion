@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
     "/unregister",
     tags=["users"],
     response_model=UsersResponse,
-    summary="User logout.",
+    summary="Unregister user.",
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_502_BAD_GATEWAY: {"model": ErrorResponse}},
 )
