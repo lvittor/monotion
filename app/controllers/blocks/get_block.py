@@ -27,16 +27,16 @@ async def get_block(
 ):
     log.info(f"GET /block/{id}")
     block_id = PydanticObjectId.validate(id)
-    block = database.blocks.find_one({"_id": block_id})
-    block = Block(**block)
     user = User(**user)
-    if id in user.get_all_allowed_blocks():
+    if block_id not in user.get_all_allowed_blocks():
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             content=ErrorResponse(
-                code=status.HTTP_401_UNAUTHORIZED,
+                code=status.HTTP_403_FORBIDDEN,
                 message="Unauthorized access to block.",
             ).dict(exclude_none=True),
         )
+    block = database.blocks.find_one({"_id": block_id})
+    block = Block(**block)
 
     return BaseResponse(success=True, properties={"block": block.to_json()})
