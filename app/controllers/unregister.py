@@ -25,7 +25,7 @@ async def unregister(
 ):
     log.info("POST /unregister")
 
-    found = database.users.find_one({"email": user.email})
+    found = database.users.find_one({"email": user['email']})
     database.users.delete_one({"_id": found["_id"]})
 
     # Podríamos catchear la excepción de la base de datos en caso de que no se pueda
@@ -34,9 +34,7 @@ async def unregister(
     #     raise Exception:
 
     deleted_user = {
-        "deleted_user": {
-            "email": f"{found['email']}",
-            "username": f"{found['username']}"
-        }
+        "email": f"{found['email']}",
+        "username": f"{found['username']}"
     }
     return UsersResponse(success=True, properties={"deleted_user": deleted_user})
