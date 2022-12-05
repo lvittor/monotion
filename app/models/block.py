@@ -152,9 +152,6 @@ class Block(BaseBlock):
     def __init__(self, **data):
         super().__init__(**data)
 
-    def to_json(self):
-        return json.loads(json_util.dumps(self.__dict__))
-
     class Config:
         allow_population_by_field_name = True
         use_enum_values = True

@@ -1,6 +1,8 @@
+import json
 from typing import Optional
 from uuid import uuid4
 
+from bson import json_util
 from pydantic import UUID4, BaseModel, EmailStr, Field
 
 
@@ -24,6 +26,9 @@ class User(BaseModel):
                 "viewerPages": ["5das7qh1", "8xcaxy21"],
             }
         }
+
+    def to_json(self):
+        return json.loads(json_util.dumps(self.__dict__))
 
     def get_all_allowed_blocks(self):
         return self.ownerPages + self.viewerPages + self.editorPages

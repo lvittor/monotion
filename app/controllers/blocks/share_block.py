@@ -1,25 +1,59 @@
 import logging
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
+from pymongo import MongoClient
 
 from app.exceptions.http import HTTPException
-from app.views import ErrorResponse, ReadyResponse
+from app.models.block import Block, PydanticObjectId
+from app.models.user import User
+from app.utils import MongoDBClient, UserVerificationClient
+from app.views import BaseResponse, ErrorResponse
 
 router = APIRouter()
 log = logging.getLogger(__name__)
 
 
-@router.post(
-    "/block/share/{id}",
+@router.put(
+    "/block/{block_id}/share",
     tags=["blocks"],
-    response_model=ReadyResponse,
+    response_model=BaseResponse,
     summary="Share a block.",
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_502_BAD_GATEWAY: {"model": ErrorResponse}},
 )
-async def share_block(id):
-    log.info(f"POST /block/share/{id}")
+async def share_block(
+    block_id,
+    user_email,
+    database: MongoClient = Depends(MongoDBClient.get_database),
+    user: User = Depends(UserVerificationClient.get_current_user),
+):
+    log.info(f"PUT /block/{block_id}/share")
+    block_id = PydanticObjectId.validate(block_id)
+    if block_id not in user['ownerPages']:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content=ErrorResponse(
+                code=status.HTTP_403_FORBIDDEN,
+                message="Unauthorized action over block.",
+            ).dict(exclude_none=True),
+        )
 
-    # Share a block
+    database.users.update_one(
+        {"email": user_email},
+        {"$push": {"editorPages": str(block_id), "viewerPages": str(block_id)}},
+    )
+    block = database.blocks.find_one({"_id": block_id})
+    # We don't need to validate block type, as in ownerPages will only be blocks with page type
 
-    return ReadyResponse(status="ok")
+    shared_with = database.users.find_one({"email": user_email})
+    block = Block(**block)
+    shared_with = User(**shared_with)
+
+    return BaseResponse(
+        success=True,
+        properties={
+            "shared_with_user": shared_with.to_json(),
+            "block_id": str(block_id),
+            "block": block.to_json(),
+        },
+    )
