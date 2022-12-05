@@ -5,16 +5,16 @@ from fastapi import APIRouter, Depends, status
 from app.exceptions.http import HTTPException
 from app.models import User
 from app.utils import MongoDBClient, UserVerificationClient
-from app.views import ErrorResponse, ReadyResponse
+from app.views import BaseResponse, ErrorResponse
 
 router = APIRouter()
 log = logging.getLogger(__name__)
 
 
 @router.delete(
-    "/block/{id}",
+    "/block/{id}/delete",
     tags=["blocks"],
-    response_model=ReadyResponse,
+    response_model=BaseResponse,
     summary="Delete a block.",
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_502_BAD_GATEWAY: {"model": ErrorResponse}},
@@ -24,8 +24,11 @@ async def delete_block(
     user: User = Depends(UserVerificationClient.get_current_user),
     database=Depends(MongoDBClient.get_database),
 ):
-    log.info(f"Delete /block/{id}")
+    log.info(f"Delete /block/{id}/delete")
 
-    # Delete a block
+    # It should delete the block and al of its content. It should remove its ID
+    # and its content blocks IDs. If it is a page, it should remove all of its references
+    # in every existing user.
+    # Inefficient
 
-    return ReadyResponse(status="ok")
+    return BaseResponse(success=True, properties={})
