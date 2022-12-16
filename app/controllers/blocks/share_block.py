@@ -24,11 +24,13 @@ log = logging.getLogger(__name__)
 async def share_block(
     block_id,
     user_email,
+    permission,
     database: MongoClient = Depends(MongoDBClient.get_database),
     user: User = Depends(UserVerificationClient.get_current_user),
 ):
     log.info(f"PUT /block/{block_id}/share")
     block_id = PydanticObjectId.validate(block_id)
+    # TODO: validate permission
     if block_id not in user['ownerPages']:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -38,10 +40,18 @@ async def share_block(
             ).dict(exclude_none=True),
         )
 
-    database.users.update_one(
-        {"email": user_email},
-        {"$push": {"editorPages": str(block_id), "viewerPages": str(block_id)}},
-    )
+    if permission == "editor":
+        database.users.update_one(
+            {"email": user_email},
+            {"$push": {"editorPages": block_id}},
+        )
+
+    if permission == "viewer":
+        database.users.update_one(
+            {"email": user_email},
+            {"$push": {"viewerPages": block_id}},
+        )
+
     block = database.blocks.find_one({"_id": block_id})
     # We don't need to validate block type, as in ownerPages will only be blocks with page type
 
