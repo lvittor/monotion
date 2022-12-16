@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, status
+from pymongo import MongoClient
 
 from app.exceptions.http import HTTPException
 from app.models import User
@@ -23,7 +24,7 @@ log = logging.getLogger(__name__)
 async def get_block(
     id,
     user: User = Depends(UserVerificationClient.get_current_user),
-    database=Depends(MongoDBClient.get_database),
+    database: MongoClient = Depends(MongoDBClient.get_database),
 ):
     log.info(f"GET /block/{id}")
     block_id = PydanticObjectId.validate(id)
