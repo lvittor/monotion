@@ -32,3 +32,7 @@ class User(BaseModel):
 
     def get_all_allowed_blocks(self):
         return self.ownerPages + self.viewerPages + self.editorPages
+
+    @classmethod
+    def validate_shareable_permission(self, permission):
+        return permission in ["editor", "viewer"]

@@ -30,8 +30,8 @@ async def share_block(
 ):
     log.info(f"PUT /block/{block_id}/share")
     block_id = PydanticObjectId.validate(block_id)
-    # TODO: validate permission
-    if block_id not in user['ownerPages']:
+    valid_perm = User.validate_shareable_permission(permission)
+    if block_id not in user['ownerPages'] or not valid_perm:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             content=ErrorResponse(
