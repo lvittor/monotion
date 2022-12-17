@@ -7,11 +7,11 @@ database.createCollection('blocks');
 
 database.users.insertOne(
     {
-        _id: ObjectId('639d2ffd68002586d68b232d'),
-        email: 'a@gmail.com',
-        username: 'a',
-        password: '$2b$12$xg/t03ATVG2fRNV9yh8EAueJk9TQgJ.STt5c4ohpLaI8mSLg8qdly', 
-        pages: [ 
+        "_id": ObjectId('639d2ffd68002586d68b232d'),
+        "email": 'a@gmail.com',
+        "username": 'a',
+        "password": '$2b$12$xg/t03ATVG2fRNV9yh8EAueJk9TQgJ.STt5c4ohpLaI8mSLg8qdly',
+        "pages": [
             ObjectId("639d4d76abd94dd94b2348cb") 
         ],
     }
