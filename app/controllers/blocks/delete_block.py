@@ -81,3 +81,7 @@ def remove_block_children(block, database):
         remove_block_children(block, database)  # go deeper
 
         database.blocks.delete_one({"_id": child})  # remove the block
+
+        # TODO: REMOVE THE BLOCK FROM THE USER IF IT'S A PAGE
+        # if block.type == BlockType.PAGE:
+        #    database.users.update_one({"_id": block.creator}, {"$pull": {"blocks": child}})  # remove the block from the user
