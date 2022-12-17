@@ -43,6 +43,3 @@ async def get_block(
         )
 
     return BaseResponse(success=True, properties={"block": block.to_json()})
-
-
-# Unauthorized access to block. [ObjectId('639d2ffd68002586d68b232d')] != 639d2ffd68002586d68b232d.",
