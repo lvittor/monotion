@@ -5,7 +5,7 @@ database = db.getSiblingDB('mongodb');
 database.createCollection('users');
 database.createCollection('blocks');
 
-database.users.insertOne(
+database.users.insertMany([
     {
         "_id": ObjectId('639d2ffd68002586d68b232d'),
         "email": 'a@gmail.com',
@@ -14,8 +14,15 @@ database.users.insertOne(
         "pages": [
             ObjectId("639d4d76abd94dd94b2348cb") 
         ],
+    },
+    {
+        "_id": ObjectId('639e1f2740963d84f4950012'),
+        "email": 'b@gmail.com',
+        "username": 'b',
+        "password": '$2b$12$nZvUwDGzkQRFohMbHq7mR.pL4TFLeTfxmCXxqCza2xMTAhzh26PNy',
+        "pages": [],
     }
-);
+]);
 
 database.blocks.insertMany([
     {
@@ -29,8 +36,9 @@ database.blocks.insertMany([
         "content": [
             ObjectId("639d4d9aabd94dd94b2348cc")
         ],
-        "is_public": false,
-        "creator": ObjectId("639d2ffd68002586d68b232d")
+        "is_public": true,
+        "creator": ObjectId("639d2ffd68002586d68b232d"),
+        "page_owner": ObjectId("639d2ffd68002586d68b232d")
     },
     {
         "_id": ObjectId("639d4d9aabd94dd94b2348cc"),
@@ -44,8 +52,9 @@ database.blocks.insertMany([
             ObjectId("639d516a7e496c4aea0f8bcb"),
             ObjectId("639d518f7e496c4aea0f8bcd"),
         ],
-        "is_public": false,
-        "creator": ObjectId("639d2ffd68002586d68b232d")
+        "is_public": true,
+        "creator": ObjectId("639d2ffd68002586d68b232d"),
+        "page_owner": ObjectId("639d2ffd68002586d68b232d")
     },
     {
         "_id": ObjectId("639d516a7e496c4aea0f8bcb"),
@@ -58,8 +67,9 @@ database.blocks.insertMany([
         "content": [
             ObjectId("639d517b7e496c4aea0f8bcc")
         ],
-        "is_public": false,
-        "creator": ObjectId("639d2ffd68002586d68b232d")
+        "is_public": true,
+        "creator": ObjectId("639d2ffd68002586d68b232d"),
+        "page_owner": ObjectId("639d2ffd68002586d68b232d")
     },
     {
         "_id": ObjectId("639d517b7e496c4aea0f8bcc"),
@@ -70,8 +80,9 @@ database.blocks.insertMany([
         },
         "parent": ObjectId("639d516a7e496c4aea0f8bcb"),
         "content": [],
-        "is_public": false,
-        "creator": ObjectId("639d2ffd68002586d68b232d")
+        "is_public": true,
+        "creator": ObjectId("639d2ffd68002586d68b232d"),
+        "page_owner": ObjectId("639d2ffd68002586d68b232d")
     },
     {
         "_id": ObjectId("639d518f7e496c4aea0f8bcd"),
@@ -82,8 +93,9 @@ database.blocks.insertMany([
         },
         "parent": ObjectId("639d4d9aabd94dd94b2348cc"),
         "content": [],
-        "is_public": false,
-        "creator": ObjectId("639d2ffd68002586d68b232d")
+        "is_public": true,
+        "creator": ObjectId("639d2ffd68002586d68b232d"),
+        "page_owner": ObjectId("639d2ffd68002586d68b232d")
     }
 ]);
 

@@ -28,10 +28,27 @@ async def create_block(
     log.info("POST /block/create")
 
     user_id = database.users.find_one({"email": user.email})['_id']
-    block = Block(creator=user_id, **blockRequest.dict())
+    block = Block(creator=user_id, page_owner=user_id, **blockRequest.dict())
+    parent_block_info = database.blocks.find_one({"_id": block.parent})
+    parent_block = Block(**parent_block_info) if parent_block_info else None
 
     if await block.is_valid_block():
+
+        if parent_block and str(user_id) != str(parent_block.page_owner) and block.type == BlockType.PAGE.value:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content=ErrorResponse(
+                    code=status.HTTP_403_FORBIDDEN,
+                    message="You have no permissions to create a page block in a public page.",
+                ).dict(exclude_none=True),
+            )
+
         block_id = database.blocks.insert_one(block.dict()).inserted_id
+        page_owner = parent_block.page_owner if parent_block is not None else user_id
+        database.blocks.update_one(
+            {"_id": block_id},
+            {"$set": {"page_owner": page_owner}}
+        )
 
         if block.is_valid_page():  # Update the user's owner page list.
             database.users.update_one(
@@ -44,6 +61,15 @@ async def create_block(
                 {"_id": block.parent},
                 {"$push": {"content": block_id}},
             )
+
+        if parent_block and parent_block.is_public:
+            database.blocks.update_one(
+                {"_id": block_id},
+                {"$set": {"is_public": True}}
+            )
+        # TODO: verify if this is the only way to update object from db
+        updated_block = database.blocks.find_one({"_id": block_id})
+        updated_block = Block(**updated_block)
     else:
         log.error(
             f"Block is invalid. Please check the blockRequest: {blockRequest.dict()}"
@@ -57,5 +83,5 @@ async def create_block(
         )
 
     return BaseResponse(
-        success=True, properties={"block_id": str(block_id), "block": block.to_json()}
+        success=True, properties={"block_id": str(block_id), "block": updated_block.to_json()}
     )
