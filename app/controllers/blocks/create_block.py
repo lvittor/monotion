@@ -34,12 +34,12 @@ async def create_block(
         if block.is_valid_page():  # Update the user's owner page list.
             database.users.update_one(
                 {"_id": current_user_id},
-                {"$push": {"ownerPages": str(block_id)}},
+                {"$push": {"ownerPages": block_id}},
             )
         if block.parent:  # Update the parent block's children (i.e. content) list.
             database.blocks.update_one(
                 {"_id": block.parent},
-                {"$push": {"content": str(block_id)}},
+                {"$push": {"content": block_id}},
             )
     else:
         log.error(
