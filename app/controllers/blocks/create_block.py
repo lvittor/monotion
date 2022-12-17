@@ -23,19 +23,22 @@ log = logging.getLogger(__name__)
 async def create_block(
     blockRequest: BlockRequest,
     database: MongoClient = Depends(MongoDBClient.get_database),
-    current_user: User = Depends(UserVerificationClient.get_current_user),
+    user: User = Depends(UserVerificationClient.get_current_user),
 ):
     log.info("POST /block/create")
 
-    current_user_id = database.users.find_one({"email": current_user['email']})['_id']
-    block = Block(**blockRequest.dict(), editors=[current_user_id])
+    user_id = database.users.find_one({"email": user.email})['_id']
+    block = Block(creator=user_id, **blockRequest.dict())
+
     if await block.is_valid_block():
         block_id = database.blocks.insert_one(block.dict()).inserted_id
+
         if block.is_valid_page():  # Update the user's owner page list.
             database.users.update_one(
-                {"_id": current_user_id},
-                {"$push": {"ownerPages": block_id}},
+                {"_id": user_id},
+                {"$push": {"pages": block_id}},
             )
+
         if block.parent:  # Update the parent block's children (i.e. content) list.
             database.blocks.update_one(
                 {"_id": block.parent},

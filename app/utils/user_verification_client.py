@@ -7,7 +7,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.exceptions.http import HTTPException
-from app.models import TokenData
+from app.models import TokenData, User
 from app.settings import settings
 from app.utils import MongoDBClient
 from app.views import ErrorResponse
@@ -63,7 +63,7 @@ class UserVerificationClient:
         user = database.users.find_one({"email": token_data.email})
         if not user:
             raise credentials_exception
-        return user
+        return User(**user)
 
     @classmethod
     def create_access_token(

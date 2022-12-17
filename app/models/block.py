@@ -145,12 +145,17 @@ class Block(BaseBlock):
     content: Optional[List[PydanticObjectId]] = Field(
         default_factory=list, alias="content", uniqueItems=True
     )
-    editors: Optional[List[PydanticObjectId]] = Field(
-        default_factory=list, alias="editors", uniqueItems=True
+
+    is_public: Optional[bool] = Field(
+        default_factory=list, alias="is_public", uniqueItems=True
     )
 
-    def __init__(self, **data):
+    creator: Optional[PydanticObjectId] = Field(None, alias="creator")
+
+    def __init__(self, creator, is_public=False, **data):
         super().__init__(**data)
+        self.creator = creator
+        self.is_public = is_public
 
     def to_json(self):
         return json.loads(json_util.dumps(self.__dict__))
@@ -165,7 +170,7 @@ class Block(BaseBlock):
                 "type": "to_do",
                 "properties": {"title": "Hello World", "checked": "No"},
                 "content": ["00315dfb", "bf2d3c32", "3070827f"],
-                "editors": ["1", "2"],
+                "is_public": True,
                 "parent": "638c2fde3d4ef9116671fd4a",
             }
         }
