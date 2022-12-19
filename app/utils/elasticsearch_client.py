@@ -15,7 +15,6 @@ class ElasticsearchClient():
         if not cls.client:
             cls.client = Elasticsearch(
                 hosts=settings.ELASTICSEARCH_HOSTS, 
-                connection_class=RequestsHttpConnection, 
                 max_retries=30,
                 retry_on_timeout=True, 
                 request_timeout=30
