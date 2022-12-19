@@ -10,9 +10,6 @@ RUN apt-get update && \
     pip install -U pip && \
     pip install psycopg2-binary==2.9.3
 
-# Install Hasura client
-RUN curl -L -s -S https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | VERSION=v2.2.2 bash
-
 # Install Python env
 RUN pip install "poetry==$POETRY_VERSION" && poetry config virtualenvs.create false
 COPY ./pyproject.toml /code/
