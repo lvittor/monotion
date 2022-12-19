@@ -26,15 +26,10 @@ async def get_block(
     database=Depends(MongoDBClient.get_database),
 ):
     log.info(f"GET /block/{id}")
-<<<<<<< HEAD
-
-    # Get block id
-=======
     block_id = PydanticObjectId.validate(id)
     block = database.blocks.find_one({"_id": block_id})
     block = Block(**block)
     user_id = database.users.find_one({"email": user.email})['_id']
->>>>>>> develop
 
     if not block.is_public and block.creator != user_id:
         raise HTTPException(
