@@ -26,20 +26,33 @@ services:
         depends_on:
             - mongo
         environment:
-            POSTGRES_USER: "${POSTGRES_USER}"
-            POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-            POSTGRES_DB: "${POSTGRES_DB}"
-            POSTGRES_HOST: "${POSTGRES_HOST}"
-            POSTGRES_PORT: "${POSTGRES_PORT}"
-            
-    postgres:
-        image: postgres:13.8
+            MONGO_USER: "${MONGO_USER}"
+            MONGO_PASSWORD: "${MONGO_PASSWORD}"
+            MONGO_DB: "${MONGO_DB}"
+            MONGO_HOST: "${MONGO_HOST}"
+            MONGO_PORT: "${MONGO_PORT}"
+            SECRET_KEY: "${SECRET_KEY}"
+            ALGORITHM: "${ALGORITHM}"
+            ACCESS_TOKEN_EXPIRE_MINUTES: "${ACCESS_TOKEN_EXPIRE_MINUTES}"
+            MONGO_SERVER_SELECTION_TIMEOUT_MS: "${MONGO_SERVER_SELECTION_TIMEOUT_MS}"
+            PYTHONUNBUFFERED : ${PYTHONUNBUFFERED}
+    
+    mongo:
+        image: mongo:4.4.4
+        container_name: mongodb
+        restart: always
         ports:
             - ${MONGO_PORT}:27017
         environment:
-            POSTGRES_USER: "${POSTGRES_USER}"
-            POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-            POSTGRES_DB: "${POSTGRES_DB}"
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+            MONGO_INITDB_DATABASE: ${MONGO_DB}
+        volumes:
+            - ./init-mongo-db.d/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+
+    mongo-express:
+        image: mongo-express
+        container_name: mongo-express
         restart: always
         ports:
             - 8081:8081
@@ -74,38 +87,38 @@ services:
         depends_on:
             - waitfor-db
 
-    graphql-engine:
-        image: hasura/graphql-engine:v2.2.2.cli-migrations-v2
-        working_dir: /code
-        volumes:
-            - ..:/code
+    elasticsearch:
+        container_name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        environment:
+            - xpack.security.enabled=false
+            - "discovery.type=single-node"
+            - ES_JAVA_OPTS=-Xms750m -Xmx750m
+        networks:
+            - es-net
         ports:
-            - "8080:8080"
-        depends_on:
-            - init-db
-        restart: always
+            - 9200:9200  
+      
+    kibana:
+        container_name: kibana
+        image: docker.elastic.co/kibana/kibana:7.11.0
         environment:
-            HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/postgres
-            ## enable the console served by server
-            HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
-            ## enable debugging mode. It is recommended to disable this in production
-            HASURA_GRAPHQL_DEV_MODE: "true"
-            HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
-            ACTION_API_DOMAIN: http://backend/
-            <<: *hasura-env-vars
-
-    init-hasura:
-        image: hasura/graphql-engine:v2.2.2.cli-migrations-v2
-        working_dir: /code/hasura
-        volumes:
-            - ..:/code
+            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        networks:
+            - es-net
         depends_on:
-            - graphql-engine
-        entrypoint: bash -c "/code/scripts/wait-for.sh -t 60 graphql-engine:8080/healthz -- hasura-cli metadata apply"
-        environment:
-            HASURA_GRAPHQL_ENDPOINT: http://graphql-engine:8080
-            <<: *hasura-env-vars
+            - elasticsearch
+        ports:
+            - 5601:5601
 
 volumes:
     backend:
         name: "backend"
+
+networks:
+  es-net:
+    driver: bridge
