@@ -44,7 +44,7 @@ This client provides us an easy way to interact with our MongoDB instance. We ca
 ### Considerations
 - We decided to change the implementation proposed in the first presentation of this project, as the deletion process was not efficient and the entire collec
 tion of users was iterated when a block was trying to be deleted.
-- We decided to share documents publicly instead of shareing them to a certain group of people.
+- We decided to share documents publicly instead of shareing them to a certain group of users.
 - We decided not to allow all users to create a page-type block inside of another public page. Only the page owner would be the only one capable of creating a
 page inside an existing page.
 
