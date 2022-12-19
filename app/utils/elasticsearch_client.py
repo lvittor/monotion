@@ -3,14 +3,16 @@ import logging
 from elasticsearch import Elasticsearch
 from app.settings import settings
 
+import json
+from bson import json_util
+
 class ElasticsearchClient():
     log: logging.Logger = logging.getLogger(__name__)
     client = None
 
     @classmethod
     async def get_client(cls):
-        """Get Elasticsearch client.
-        """
+        """Get Elasticsearch client."""
         cls.log.info(f"Creating Elasticsearch client with URI: {settings.ELASTICSEARCH_HOSTS}")
         if not cls.client:
             cls.client = Elasticsearch(
@@ -36,7 +38,12 @@ class ElasticsearchClient():
         try:
             client = await cls.get_client()
             if not client.ping():
-                return ValueError("Connection failed")
+                raise ValueError("Connection failed") 
+            return True
         except ValueError as e:
             cls.log.error(f"Elasticsearch server ping failed: {e}")
             return False
+
+    @classmethod
+    def to_json(cls, _dict):
+        return json.loads(json_util.dumps(_dict))

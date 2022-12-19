@@ -5,8 +5,10 @@ from pymongo import MongoClient
 
 from app.exceptions.http import HTTPException
 from app.models import Block, BlockRequest, BlockType, User
-from app.utils import MongoDBClient, UserVerificationClient
+from app.utils import MongoDBClient, UserVerificationClient, ElasticsearchClient
 from app.views import BaseResponse, ErrorResponse
+
+import json
 
 router = APIRouter()
 log = logging.getLogger(__name__)
@@ -24,6 +26,7 @@ async def create_block(
     blockRequest: BlockRequest,
     database: MongoClient = Depends(MongoDBClient.get_database),
     user: User = Depends(UserVerificationClient.get_current_user),
+    es: ElasticsearchClient = Depends(ElasticsearchClient.get_client)
 ):
     log.info("POST /block/create")
 
@@ -70,6 +73,7 @@ async def create_block(
         # TODO: verify if this is the only way to update object from db
         updated_block = database.blocks.find_one({"_id": block_id})
         updated_block = Block(**updated_block)
+        es_response = es.index(index="block-index", document=updated_block.to_json())
     else:
         log.error(
             f"Block is invalid. Please check the blockRequest: {blockRequest.dict()}"
@@ -83,5 +87,5 @@ async def create_block(
         )
 
     return BaseResponse(
-        success=True, properties={"block_id": str(block_id), "block": updated_block.to_json()}
+        success=True, properties={"block_id": str(block_id), "block": updated_block.to_json(), "es_response": ElasticsearchClient.to_json(es_response)}
     )
