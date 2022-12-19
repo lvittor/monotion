@@ -29,8 +29,7 @@ database.blocks.insertMany([
         "_id": ObjectId("639d4d76abd94dd94b2348cb"),
         "type": "page",
         "properties": {
-            "title": "RP",
-            "checked": "No"
+            "title": "RP"
         },
         "parent": null,
         "content": [
