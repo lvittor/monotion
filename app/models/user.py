@@ -8,9 +8,7 @@ class User(BaseModel):
     email: EmailStr = Field(..., alias="email")
     username: str = Field(..., alias="name")
     password: str = Field(..., alias="password")
-    ownerPages: Optional[list] = Field(default_factory=list, alias="ownerPages")
-    editorPages: Optional[list] = Field(default_factory=list, alias="editorPages")
-    viewerPages: Optional[list] = Field(default_factory=list, alias="viewerPages")
+    pages: Optional[list] = Field(default_factory=list, alias="pages")
 
     class Config:
         allow_population_by_field_name = True
@@ -19,8 +17,6 @@ class User(BaseModel):
                 "email": "example@gmail.com",
                 "username": "user",
                 "password": "password",
-                "ownerPages": ["f7f91xw5", "914aad24"],
-                "editorPages": ["wfa642ju", "acd22d14"],
-                "viewerPages": ["5das7qh1", "8xcaxy21"],
+                "pages": ["f7f91xw5", "914aad24"],
             }
         }

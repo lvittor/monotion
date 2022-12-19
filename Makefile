@@ -82,7 +82,3 @@ cop: ## Run precommit hooks
 restart-backend: ## Restart the backend
 	$(call log, Restarting the backend...)
 	$(DOCKER_COMPOSE_CMD) restart backend
-
-hasura-cli: ## Hasura command-line interface
-	$(call log, Using hasura-cli...)
-	$(DOCKER_COMPOSE_CMD) exec -w /code/hasura graphql-engine hasura-cli migrate create

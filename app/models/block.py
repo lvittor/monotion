@@ -120,7 +120,7 @@ class BaseBlock(BaseModel):
         return self.type == BlockType.PAGE.value
 
     def is_valid_page(self):
-        return self.is_page() and self.parent is None
+        return self.is_page()
 
     async def has_valid_parent(self):
         """Check if parent is None or exists in the database."""
@@ -145,12 +145,23 @@ class Block(BaseBlock):
     content: Optional[List[PydanticObjectId]] = Field(
         default_factory=list, alias="content", uniqueItems=True
     )
-    editors: Optional[List[PydanticObjectId]] = Field(
-        default_factory=list, alias="editors", uniqueItems=True
+
+    is_public: Optional[bool] = Field(
+        default_factory=list, alias="is_public", uniqueItems=True
     )
 
-    def __init__(self, **data):
+    creator: Optional[PydanticObjectId] = Field(None, alias="creator")
+
+    page_owner : Optional[PydanticObjectId] = Field(None, alias="page_owner")
+
+    def __init__(self, creator, page_owner, is_public=False, **data):
         super().__init__(**data)
+        self.creator = creator
+        self.is_public = is_public
+        self.page_owner = page_owner
+
+    def to_json(self):
+        return json.loads(json_util.dumps(self.__dict__))
 
     class Config:
         allow_population_by_field_name = True
@@ -162,8 +173,10 @@ class Block(BaseBlock):
                 "type": "to_do",
                 "properties": {"title": "Hello World", "checked": "No"},
                 "content": ["00315dfb", "bf2d3c32", "3070827f"],
-                "editors": ["1", "2"],
+                "is_public": True,
                 "parent": "638c2fde3d4ef9116671fd4a",
+                "creator": "",
+                "page_owner": ""
             }
         }
 
