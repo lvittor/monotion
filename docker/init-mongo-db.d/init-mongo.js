@@ -8,18 +8,18 @@ database.createCollection('blocks');
 database.users.insertMany([
     {
         "_id": ObjectId('639d2ffd68002586d68b232d'),
-        "email": 'a@gmail.com',
-        "username": 'a',
-        "password": '$2b$12$xg/t03ATVG2fRNV9yh8EAueJk9TQgJ.STt5c4ohpLaI8mSLg8qdly',
+        "email": 'admin@gmail.com',
+        "username": 'admin',
+        "password": '$2b$12$b6eMV4SXj8mOIKKaf1NddueuRsa7hEUbu3qqGRVIhdytSH3mjM0GW',
         "pages": [
             ObjectId("639d4d76abd94dd94b2348cb") 
         ],
     },
     {
         "_id": ObjectId('639e1f2740963d84f4950012'),
-        "email": 'b@gmail.com',
-        "username": 'b',
-        "password": '$2b$12$nZvUwDGzkQRFohMbHq7mR.pL4TFLeTfxmCXxqCza2xMTAhzh26PNy',
+        "email": 'bot@gmail.com',
+        "username": 'bot',
+        "password": '$2b$12$A2gNGpCIlP5/Rj1Y5LVAS.LqOJPyQ7sT19ZZw/1kSx7BGkyH5UMEW',
         "pages": [],
     }
 ]);
