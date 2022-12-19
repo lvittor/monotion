@@ -73,7 +73,7 @@ async def create_block(
         # TODO: verify if this is the only way to update object from db
         updated_block = database.blocks.find_one({"_id": block_id})
         updated_block = Block(**updated_block)
-        es_response = es.index(index="block-index", document=updated_block.to_json())
+        es_response = es.index(index="block-index", document=ElasticsearchClient.to_json(updated_block.properties))
     else:
         log.error(
             f"Block is invalid. Please check the blockRequest: {blockRequest.dict()}"
