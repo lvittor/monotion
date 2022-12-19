@@ -29,7 +29,7 @@ make up
 ## Work and considerations
 
 Now that the project was built and is now running, we can now interact with the Swagger interface and the Mongo Express client respectively
-located in `localhost:3000/docs` and `localhost:8081`.
+located in `localhost:8002/docs` and `localhost:8081`.
 
 ### Swagger
 Using this tool, we can interact in a more intuitive way with the API. We can now try every existing method and 
