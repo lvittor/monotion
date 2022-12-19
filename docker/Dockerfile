@@ -2,7 +2,7 @@ FROM python:3.10.0
 
 WORKDIR /code
 
-ENV POETRY_VERSION=1.1.13
+ENV POETRY_VERSION=1.3.1
 
 # Install system deps
 RUN apt-get update && \

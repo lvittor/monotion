@@ -4,7 +4,7 @@ from fastapi import APIRouter, status
 
 from app.exceptions.http import HTTPException
 from app.settings import settings
-from app.utils import MongoDBClient
+from app.utils import MongoDBClient, ElasticsearchClient
 from app.views import ErrorResponse, ReadyResponse
 
 router = APIRouter()
@@ -28,6 +28,16 @@ async def ready():
             content=ErrorResponse(
                 code=status.HTTP_502_BAD_GATEWAY,
                 message="Could not connect to MongoDB",
+            ).dict(exclude_none=True),
+        )
+        
+    if not await ElasticsearchClient.ping():
+        log.error("Could not connect to ElasticsearchClient")
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            content=ErrorResponse(
+                code=status.HTTP_502_BAD_GATEWAY,
+                message="Could not connect to ElasticsearchClient",
             ).dict(exclude_none=True),
         )
 

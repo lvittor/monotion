@@ -26,5 +26,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = os.getenv("ALGORITHM")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 
+    ELASTICSEARCH_HOSTS: str = os.getenv("")
+
 
 settings = Settings()

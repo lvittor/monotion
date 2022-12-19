@@ -35,8 +35,10 @@ services:
             ALGORITHM: "${ALGORITHM}"
             ACCESS_TOKEN_EXPIRE_MINUTES: "${ACCESS_TOKEN_EXPIRE_MINUTES}"
             MONGO_SERVER_SELECTION_TIMEOUT_MS: "${MONGO_SERVER_SELECTION_TIMEOUT_MS}"
-            PYTHONUNBUFFERED : ${PYTHONUNBUFFERED}
-    
+            PYTHONUNBUFFERED : "${PYTHONUNBUFFERED}"
+            ELASTICSEARCH_HOSTS : http://elasticsearch:9200
+
+
     mongo:
         image: mongo:4.4.4
         container_name: mongodb
