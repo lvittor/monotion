@@ -31,7 +31,7 @@ make up
 Now that the project was built and is now running, we can now interact with the Swagger interface and the Mongo Express client respectively
 located in `localhost:8002/docs` and `localhost:8081`.
 
-### Swagger
+### Swagger (`http://localhost:8002/docs`)
 Using this tool, we can interact in a more intuitive way with the API. We can now try every existing method.
 
 ![image](https://user-images.githubusercontent.com/67807553/208692686-aa345d08-7a82-41f0-8d54-8688a9a1d978.png)
@@ -47,12 +47,12 @@ bot@gmail.com
 bot
 ```
 
-### Mongo Express Client
+### Mongo Express Client (`http://localhost:8081`)
 This client provides us an easy way to interact with our MongoDB instance. We can consult any collections and see how the API impacts our DB.
 
 ![image](https://user-images.githubusercontent.com/67807553/208691955-27554042-a7da-4b19-bf2d-79835437ebfe.png)
 
-### Kibana
+### Kibana (`http://localhost:5601`)
 Using this data visualizer, we can see in detail our indexes and how they were built.
 
 ![image](https://user-images.githubusercontent.com/67807553/208727519-7e96fbb7-0233-412f-b8b4-93f18cd87557.png)
