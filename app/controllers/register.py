@@ -6,7 +6,7 @@ from pymongo.errors import DuplicateKeyError
 
 from app.exceptions.http import HTTPException
 from app.models import User
-from app.utils import MongoDBClient, UserVerificationClient
+from app.utils import ElasticsearchClient, MongoDBClient, UserVerificationClient
 from app.views import BaseResponse, ErrorResponse
 
 router = APIRouter()
@@ -22,13 +22,18 @@ log = logging.getLogger(__name__)
     responses={status.HTTP_502_BAD_GATEWAY: {"model": ErrorResponse}},
 )
 async def register(
-    email, username, password, database=Depends(MongoDBClient.get_database)
+    email,
+    username,
+    password,
+    database=Depends(MongoDBClient.get_database),
+    es=Depends(ElasticsearchClient.get_client),
 ):
     log.info("POST /register")
+    user_id = None
     hashed_password = UserVerificationClient.get_password_hash(password)
     try:
         user = User(email=email, username=username, password=hashed_password)
-        database.users.insert_one(user.dict())
+        user_id = database.users.insert_one(user.dict())
     except DuplicateKeyError:
         log.error(f"User with email: {email} already exists.")
         raise HTTPException(
@@ -47,6 +52,14 @@ async def register(
                 message=f"The email {email} is not a valid email.",
             ).dict(exclude_none=True),
         )
+
+    es_dict = {
+        'id': str(user_id.inserted_id),
+        'username': user.dict()['username'],
+        'email': user.dict()['email'],
+    }
+    es.index(index="user-index", document=ElasticsearchClient.to_json(es_dict))
+
     return BaseResponse(
         success=True,
         properties=user.dict(exclude_none=True),

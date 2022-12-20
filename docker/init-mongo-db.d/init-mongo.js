@@ -43,7 +43,7 @@ database.blocks.insertMany([
         "_id": ObjectId("639d4d9aabd94dd94b2348cc"),
         "type": "to_do",
         "properties": {
-            "title": "A",
+            "text": "A",
             "checked": "No"
         },
         "parent": ObjectId("639d4d76abd94dd94b2348cb"),
@@ -59,7 +59,7 @@ database.blocks.insertMany([
         "_id": ObjectId("639d516a7e496c4aea0f8bcb"),
         "type": "to_do",
         "properties": {
-            "title": "B",
+            "text": "B",
             "checked": "No"
         },
         "parent": ObjectId("639d4d9aabd94dd94b2348cc"),
@@ -74,7 +74,7 @@ database.blocks.insertMany([
         "_id": ObjectId("639d517b7e496c4aea0f8bcc"),
         "type": "to_do",
         "properties": {
-            "title": "D",
+            "text": "D",
             "checked": "No"
         },
         "parent": ObjectId("639d516a7e496c4aea0f8bcb"),
@@ -87,7 +87,7 @@ database.blocks.insertMany([
         "_id": ObjectId("639d518f7e496c4aea0f8bcd"),
         "type": "to_do",
         "properties": {
-            "title": "C",
+            "text": "C",
             "checked": "No"
         },
         "parent": ObjectId("639d4d9aabd94dd94b2348cc"),
