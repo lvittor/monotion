@@ -50,7 +50,7 @@ class BaseBlock(BaseModel):
         schema_extra = {
             "example": {
                 "type": "to_do",
-                "properties": {"title": "Hello World", "checked": "No"},
+                "properties": {"text": "Hello World", "checked": "No"},
                 "parent": "638c1390af999d33f67f16f5",
             }
         }
