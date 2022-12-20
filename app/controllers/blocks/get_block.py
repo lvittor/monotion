@@ -36,9 +36,7 @@ async def get_block(
             status_code=status.HTTP_403_FORBIDDEN,
             content=ErrorResponse(
                 code=status.HTTP_403_FORBIDDEN,
-                message="Unauthorized access to block. {} != {}.".format(
-                    type(block.creator), type(user_id)
-                ),
+                message="Unauthorized access to block.",
             ).dict(exclude_none=True),
         )
 
