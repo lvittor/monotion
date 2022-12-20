@@ -23,6 +23,7 @@ services:
             - "8002:80"
         volumes:
             - ..:/code
+        restart: always
         depends_on:
             - mongo
         environment:

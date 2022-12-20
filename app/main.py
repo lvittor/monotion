@@ -7,6 +7,7 @@ from app.router import root_api_router
 from app.settings import settings
 from app.utils.aiohttp_client import AiohttpClient
 from app.utils.mongo_client import MongoDBClient
+from app.utils.elasticsearch_client import ElasticsearchClient
 
 
 async def on_startup():
@@ -19,7 +20,9 @@ async def on_startup():
     log.debug("Execute FastAPI startup event handler.")
 
     await MongoDBClient.get_client()
+    await ElasticsearchClient.start_indexes()
     AiohttpClient.get_aiohttp_client()
+   
 
 
 async def on_shutdown():
@@ -33,8 +36,8 @@ async def on_shutdown():
 
     await MongoDBClient.close_client()
     await AiohttpClient.close_aiohttp_client()
-
-
+    await ElasticsearchClient.close_client()
+    
 app = FastAPI(debug=settings.DEBUG, on_startup=[on_startup], on_shutdown=[on_shutdown])
 log = logging.getLogger(__name__)
 
