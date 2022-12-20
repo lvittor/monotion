@@ -32,14 +32,25 @@ Now that the project was built and is now running, we can now interact with the 
 located in `localhost:8002/docs` and `localhost:8081`.
 
 ### Swagger
-Using this tool, we can interact in a more intuitive way with the API. We can now try every existing method and 
-<image>
-</image>
+Using this tool, we can interact in a more intuitive way with the API. We can now try every existing method.
+
+![image](https://user-images.githubusercontent.com/67807553/208692686-aa345d08-7a82-41f0-8d54-8688a9a1d978.png)
+
+For trying out the API, the credentials for pre-existing users are
+
+```
+admin@gmail.com
+admin
+```
+```
+bot@gmail.com
+bot
+```
 
 ### Mongo Express Client
 This client provides us an easy way to interact with our MongoDB instance. We can consult any collections and see how the API impacts our DB.
-<image>
-</image>
+
+![image](https://user-images.githubusercontent.com/67807553/208691955-27554042-a7da-4b19-bf2d-79835437ebfe.png)
 
 ### Considerations
 - We decided to change the implementation proposed in the first presentation of this project, as the deletion process was not efficient and the entire collec
