@@ -113,7 +113,7 @@ class Block(BaseBlock):
         schema_extra = {
             "example": {
                 "type": "to_do",
-                "properties": {"title": "Hello World", "checked": "No"},
+                "properties": {"text": "Hello World", "checked": "No"},
                 "content": ["00315dfb", "bf2d3c32", "3070827f"],
                 "is_public": True,
                 "parent": "638c2fde3d4ef9116671fd4a",
