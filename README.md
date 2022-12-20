@@ -68,3 +68,8 @@ The yellow health of each index is due to the lack of database replicas.
 ## Requirements
 - [make](https://www.gnu.org/software/make/)
 - [docker-compose](https://docs.docker.com/compose/)
+
+## Group members
+- Leandro Ezequiel Rodriguez
+- Franco Nicolas Estevez
+- Lucas Agustin Vittor
