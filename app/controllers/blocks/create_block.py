@@ -76,10 +76,10 @@ async def create_block(
 
         if updated_block.type == BlockType.PAGE.value:
             dict_index = {"id": str(block_id), "title": updated_block.properties['title'], "is_public": updated_block.is_public, "page_owner": str(user_id)}
-            es_response = es.index(index="title-index", document=ElasticsearchClient.to_json(dict_index))
+            es.index(index="title-index", document=ElasticsearchClient.to_json(dict_index))
         else:
             dict_index = {"id": str(block_id), "type": updated_block.type, "properties": updated_block.properties, "is_public": updated_block.is_public, "creator": str(user_id)}
-            es_response = es.index(index="content-index", document=ElasticsearchClient.to_json(dict_index))
+            es.index(index="content-index", document=ElasticsearchClient.to_json(dict_index))
 
     else:
         log.error(
@@ -94,5 +94,5 @@ async def create_block(
         )
 
     return BaseResponse(
-        success=True, properties={"block_id": str(block_id), "block": updated_block.to_json(), "es_response": ElasticsearchClient.to_json(es_response)}
+        success=True, properties={"block_id": str(block_id), "block": updated_block.to_json()}
     )
