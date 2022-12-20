@@ -59,7 +59,7 @@ class BaseBlock(BaseModel):
         return json.loads(json_util.dumps(self.__dict__))
 
     def is_page(self):
-        return self.type == BlockType.PAGE.value
+        return self.type == BlockType.PAGE.value and "title" in self.properties
 
     def is_valid_page(self):
         return self.is_page()
@@ -78,8 +78,10 @@ class BaseBlock(BaseModel):
         Check if block is valid before inserting it into the database.
         It's difficult to implement since we need to define the scope of block types and their properties.
         """
+        # Return true if it has valid parent, and if it is not a page, it needs to have "text" key in properties
         return (
-            await self.has_valid_parent() and True
+            await self.has_valid_parent()
+            and (self.is_page() or "text" in self.properties)
         )  # We need to do more validations here
 
 
