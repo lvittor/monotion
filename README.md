@@ -34,6 +34,22 @@ You can check the health of the containers with:
 make ps
 ```
 
+and you should obtain this same output when doing so:
+
+```bash
+'' Showing containers status...''
+docker-compose -f ./docker/docker-compose.yaml ps
+    Name                   Command               State                          Ports                       
+------------------------------------------------------------------------------------------------------------
+backend         poetry run uvicorn app.mai ...   Up       0.0.0.0:8002->80/tcp,:::8002->80/tcp              
+elasticsearch   /bin/tini -- /usr/local/bi ...   Up       0.0.0.0:9200->9200/tcp,:::9200->9200/tcp, 9300/tcp
+init-db         poetry run uvicorn app.mai ...   Exit 0                                                     
+kibana          /bin/tini -- /usr/local/bi ...   Up       0.0.0.0:5601->5601/tcp,:::5601->5601/tcp          
+mongo-express   tini -- /docker-entrypoint ...   Up       0.0.0.0:8081->8081/tcp,:::8081->8081/tcp          
+mongodb         docker-entrypoint.sh mongod      Up       0.0.0.0:27017->27017/tcp,:::27017->27017/tcp      
+waitfor-db      /usr/local/bin/entrypoint. ...   Exit 0                                                     
+```
+
 When you finish using the repo, you can remove and stop containers with:
 
 ```bash
