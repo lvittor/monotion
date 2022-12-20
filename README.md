@@ -1,6 +1,6 @@
 # BD2 - Monotion
 
-In this project, we developed an API centered in a Notion-like block management system. Once logged in, the user can creat, edit, and share blocks as he pleases.
+In this project, we developed an API centered in a Notion-like block management system. Once logged in, the user can create, edit, and share blocks as he pleases.
 The app was developed in Python, using FastAPI module and Mongo as a document-oriented database that would help us in the block manipulation. 
 There are a few considerations that will be explained in detail in the corresponding section.
 
@@ -53,11 +53,9 @@ This client provides us an easy way to interact with our MongoDB instance. We ca
 ![image](https://user-images.githubusercontent.com/67807553/208691955-27554042-a7da-4b19-bf2d-79835437ebfe.png)
 
 ### Considerations
-- We decided to change the implementation proposed in the first presentation of this project, as the deletion process was not efficient and the entire collec
-tion of users was iterated when a block was trying to be deleted.
-- We decided to share documents publicly instead of shareing them to a certain group of users.
-- We decided not to allow all users to create a page-type block inside of another public page. Only the page owner would be the only one capable of creating a
-page inside an existing page.
+- We decided to change the implementation proposed in the first presentation of this project, as the deletion process was not efficient and the entire collection of users was iterated when a block was trying to be deleted.
+- We decided to share documents publicly instead of sharing them to a certain group of users.
+- We decided not to allow all users to create a page-type block inside of another public page. Only the page owner would be the only one capable of creating a page inside an existing page.
 
 ## Requirements
 - [make](https://www.gnu.org/software/make/)
