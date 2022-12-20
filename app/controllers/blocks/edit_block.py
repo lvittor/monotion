@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, status
 from pymongo import MongoClient
 
 from app.exceptions.http import HTTPException
-from app.models import User, Block, BlockRequest
+from app.models import User, Block, BlockRequest, BlockType
 from app.models.block import PydanticObjectId
-from app.utils import MongoDBClient, UserVerificationClient
+from app.utils import MongoDBClient, UserVerificationClient, ElasticsearchClient
 from app.views import ErrorResponse, BaseResponse
 
 router = APIRouter()
@@ -26,6 +26,7 @@ async def edit_block(
     block_request: BlockRequest,
     user: User = Depends(UserVerificationClient.get_current_user),
     database: MongoClient = Depends(MongoDBClient.get_database),
+    es: ElasticsearchClient = Depends(ElasticsearchClient.get_client)
 ):
     log.info(f"PUT /block/edit/{id}")
 
@@ -64,6 +65,16 @@ async def edit_block(
 
         updated_block = database.blocks.find_one({"_id": block_id})
         updated_block = Block(**updated_block)
+
+        # get elastic id from elastic search
+        if updated_block.type == BlockType.PAGE.value:
+            update_dict = {"title": updated_block.properties['title']}
+            es_block_id = es.search(index='title-index', query={"query_string": {"query": "id:{block_id}".format(block_id=str(block_id))}})['hits']['hits'][0]['_id']
+            es.update(index='title-index', id=es_block_id, doc=ElasticsearchClient.to_json(update_dict))
+        else:
+            update_dict = {"properties": updated_block.properties}
+            es_block_id = es.search(index='content-index', query={"query_string": {"query": "id:{block_id}".format(block_id=str(block_id))}})['hits']['hits'][0]['_id']
+            es.update(index='content-index', id=es_block_id, doc=ElasticsearchClient.to_json(update_dict))
     else:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

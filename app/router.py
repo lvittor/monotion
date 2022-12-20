@@ -18,7 +18,11 @@ from app.controllers.blocks import (
     get_block,
     share_block,
 )
-from app.controllers.search import search_content_all
+from app.controllers.search import (
+    search_pages,
+    search_content,
+    search_users
+)
 
 root_api_router = APIRouter()
 root_api_router.include_router(ready.router, tags=["ready"])
@@ -34,4 +38,6 @@ root_api_router.include_router(edit_block.router, tags=["blocks"])
 root_api_router.include_router(delete_block.router, tags=["blocks"])
 root_api_router.include_router(share_block.router, tags=["blocks"])
 
-root_api_router.include_router(search_content_all.router, tags=["search"])
+root_api_router.include_router(search_pages.router, tags=["search"])
+root_api_router.include_router(search_content.router, tags=["search"])
+root_api_router.include_router(search_users.router, tags=["search"])

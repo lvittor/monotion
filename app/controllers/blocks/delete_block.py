@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, status
 from app.exceptions.http import HTTPException
 from app.models import User
 from app.models.block import Block, BlockType, PydanticObjectId
-from app.utils import MongoDBClient, UserVerificationClient
+from app.utils import MongoDBClient, UserVerificationClient, ElasticsearchClient
 from app.views import BaseResponse, ErrorResponse
 
 router = APIRouter()
@@ -24,6 +24,7 @@ async def delete_block(
     id,
     user: User = Depends(UserVerificationClient.get_current_user),
     database=Depends(MongoDBClient.get_database),
+    es=Depends(ElasticsearchClient.get_client),
 ):
     log.info(f"Delete /block/{id}/delete")
 
@@ -57,10 +58,18 @@ async def delete_block(
     database.blocks.update_one({"_id": block.parent}, {"$pull": {"content": block_id}})
 
     # remove the block content (ie. it's children)
-    remove_block_children(block, database)
+    remove_block_children(block, database, es)
 
     # remove the block
     database.blocks.delete_one({"_id": block_id})
+
+    if block.type == BlockType.PAGE.value:
+        # get the page block id from the elastic search index
+        es_block_id = es.search(index='title-index', query={"query_string": {"query": "id:{block_id}".format(block_id=str(block_id))}})['hits']['hits'][0]['_id']
+        es.delete(index='title-index', id=es_block_id)  # remove the block from the elastic search index
+    else:
+        es_block_id = es.search(index='content-index', query={"query_string": {"query": "id:{block_id}".format(block_id=str(block_id))}})['hits']['hits'][0]['_id']
+        es.delete(index='content-index', id=es_block_id)
 
     return BaseResponse(
         success=True, properties={"block_id": str(block_id), "block": block.to_json()}
@@ -71,16 +80,22 @@ def can_delete_block(user_id, block):
     return block.creator == user_id
 
 
-def remove_block_children(block, database):
+def remove_block_children(block, database, es):
     if not block.content:
         return
 
     for child in block.content:
         block = Block(**database.blocks.find_one({"_id": child}))  # get the block
 
-        remove_block_children(block, database)  # go deeper
+        remove_block_children(block, database, es)  # go deeper
 
         database.blocks.delete_one({"_id": child})  # remove the block
 
         if block.type == BlockType.PAGE.value:
-           database.users.update_one({"_id": block.page_owner}, {"$pull": {"pages": child}})  # remove the block from the user
+            database.users.update_one({"_id": block.page_owner}, {"$pull": {"pages": child}})  # remove the block from the user
+            # get the page block id from the elastic search index
+            es_block_id = es.search(index='title-index', query={"query_string": {"query": "id:{block_id}".format(block_id=str(child))}})['hits']['hits'][0]['_id']
+            es.delete(index='title-index', id=es_block_id)  # remove the block from the elastic search index
+        else:
+            es_block_id = es.search(index='content-index', query={"query_string": {"query": "id:{block_id}".format(block_id=str(child))}})['hits']['hits'][0]['_id']
+            es.delete(index='content-index', id=es_block_id)
