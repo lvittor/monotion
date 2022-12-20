@@ -27,5 +27,12 @@ def purge_note_data(data):
 
 
 def purge_user_data(data):
-
-    return
+    purged_data = []
+    for hit in data:
+        found = {
+            "user_id": hit["_source"]["id"],
+            "username": hit["_source"]["username"],
+            "email": hit["_source"]["email"],
+        }
+        purged_data.append(found)
+    return purged_data
