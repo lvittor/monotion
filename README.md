@@ -52,10 +52,18 @@ This client provides us an easy way to interact with our MongoDB instance. We ca
 
 ![image](https://user-images.githubusercontent.com/67807553/208691955-27554042-a7da-4b19-bf2d-79835437ebfe.png)
 
+### Kibana
+Using this data visualizer, we can see in detail our indexes and how they were built.
+
+![image](https://user-images.githubusercontent.com/67807553/208727519-7e96fbb7-0233-412f-b8b4-93f18cd87557.png)
+
+The yellow health of each index is due to the lack of database replicas.
+
 ### Considerations
 - We decided to change the implementation proposed in the first presentation of this project, as the deletion process was not efficient and the entire collection of users was iterated when a block was trying to be deleted.
 - We decided to share documents publicly instead of sharing them to a certain group of users.
 - We decided not to allow all users to create a page-type block inside of another public page. Only the page owner would be the only one capable of creating a page inside an existing page.
+- We decided not to impose too many restrictions to the block properties structure. While every page has a title and the other block types have text, the block will be well formed.
 
 ## Requirements
 - [make](https://www.gnu.org/software/make/)
