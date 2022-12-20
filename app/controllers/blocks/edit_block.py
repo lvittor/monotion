@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 
 @router.put(
-    "/block/edit/{id}",
+    "/block/{id}/edit",
     tags=["blocks"],
     response_model=BaseResponse,
     summary="Edit a block.",
