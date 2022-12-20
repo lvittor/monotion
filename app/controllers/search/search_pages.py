@@ -3,10 +3,10 @@ import logging
 from fastapi import APIRouter, Depends, status
 from pymongo import MongoClient
 
-from app.exceptions.http import HTTPException
-from app.models import User, Block
+from app.models import User
+from app.utils import ElasticsearchClient, MongoDBClient, UserVerificationClient
+from app.utils.parser import purge_page_data
 from app.views import ErrorResponse, SearchResponse
-from app.utils import MongoDBClient, UserVerificationClient, ElasticsearchClient
 
 router = APIRouter()
 log = logging.getLogger(__name__)
@@ -24,13 +24,22 @@ async def search_pages(
     search: str,
     database: MongoClient = Depends(MongoDBClient.get_database),
     user: User = Depends(UserVerificationClient.get_current_user),
-    es: ElasticsearchClient = Depends(ElasticsearchClient.get_client)
+    es: ElasticsearchClient = Depends(ElasticsearchClient.get_client),
 ):
     log.info(f"GET /search/pages")
 
     user_id = database.users.find_one({"email": user.email})['_id']
-
-    query = "(title:*{search}*) AND ((is_public:true) OR (page_owner:{user_id}))".format(search=search, user_id=user_id)
+    query = (
+        "(title:*{search}*) AND ((is_public:true) OR (page_owner:{user_id}))".format(
+            search=search, user_id=user_id
+        )
+    )
     resp = es.search(index='title-index', query={"query_string": {"query": query}})
 
-    return SearchResponse(status="ok", data={'total': resp['hits']['total']['value'], 'data': resp['hits']['hits']})
+    return SearchResponse(
+        status="ok",
+        data={
+            'total': resp['hits']['total']['value'],
+            'data': purge_page_data(resp['hits']['hits']),
+        },
+    )
