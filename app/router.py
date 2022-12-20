@@ -9,7 +9,7 @@ Resources:
 
 from fastapi import APIRouter
 
-from app.controllers import logout, ready, register, token, unregister
+from app.controllers import ready, register, token, unregister
 
 from app.controllers.blocks import (
     create_block,
@@ -28,7 +28,6 @@ root_api_router = APIRouter()
 root_api_router.include_router(ready.router, tags=["ready"])
 
 root_api_router.include_router(token.router, tags=["users"])
-root_api_router.include_router(logout.router, tags=["users"])
 root_api_router.include_router(register.router, tags=["users"])
 root_api_router.include_router(unregister.router, tags=["users"])
 
