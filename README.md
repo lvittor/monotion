@@ -26,7 +26,7 @@ Once all the installation is finished, to run the project you should only run th
 make up
 ```
 
-Take in consideration that you'll need to wait some time to make the containers syncronize.
+Take into consideration that you'll need to wait some time so that containers syncronize.
 
 You can check the health of the containers with:
 
