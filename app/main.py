@@ -38,7 +38,7 @@ async def on_shutdown():
     await AiohttpClient.close_aiohttp_client()
     await ElasticsearchClient.close_client()
     
-app = FastAPI(debug=settings.DEBUG, on_startup=[on_startup], on_shutdown=[on_shutdown])
+app = FastAPI(debug=settings.DEBUG, on_startup=[on_startup], on_shutdown=[on_shutdown], title="Monotion", description="A Notion-like block management system.")
 log = logging.getLogger(__name__)
 
 app.include_router(root_api_router)
