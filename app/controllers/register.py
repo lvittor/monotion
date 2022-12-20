@@ -48,8 +48,8 @@ async def register(
                 message=f"The email {email} is not a valid email.",
             ).dict(exclude_none=True),
         )
-    
-    es_dict = {'id': user.dict()['_id'], 'username': user.dict()['username']}
+
+    es_dict = {'id': str(user_id.inserted_id), 'username': user.dict()['username']}
     es.index(index="user-index", document=ElasticsearchClient.to_json(es_dict))
     
     return BaseResponse(
